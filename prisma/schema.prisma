@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── ENUMS ──────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  DEALER
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum DealerStatus {
+  PENDING
+  APPROVED
+  BLOCKED
+}
+
+enum CarStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  SOLD
+  ARCHIVED
+}
+
+enum LeadType {
+  CALL
+  FINANCE
+  INSURANCE
+}
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  CLOSED
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  HYBRID
+  ELECTRIC
+  LPG
+}
+
+enum TransmissionType {
+  AUTOMATIC
+  MANUAL
+}
+
+enum Region {
+  NORTH
+  HAIFA
+  CENTER
+  TEL_AVIV
+  JERUSALEM
+  SOUTH
+  JUDEA_SAMARIA
+}
+
+// ─── MODELS ─────────────────────────────────────────────
+
+model User {
+  id        String     @id @default(uuid()) @db.Uuid
+  authId    String     @unique @map("auth_id")
+  email     String     @unique
+  fullName  String     @map("full_name")
+  phone     String?
+  role      UserRole   @default(DEALER)
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  dealer Dealer?
+
+  @@map("users")
+}
+
+model Dealer {
+  id           String       @id @default(uuid()) @db.Uuid
+  userId       String       @unique @map("user_id") @db.Uuid
+  businessName String       @map("business_name")
+  contactName  String       @map("contact_name")
+  phone        String
+  email        String?
+  city         String?
+  region       Region?
+  address      String?
+  logoUrl      String?      @map("logo_url")
+  description  String?      @db.Text
+  status       DealerStatus @default(PENDING)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cars  Car[]
+  leads Lead[]
+
+  @@map("dealers")
+}
+
+model Car {
+  id            String           @id @default(uuid()) @db.Uuid
+  dealerId      String           @map("dealer_id") @db.Uuid
+  status        CarStatus        @default(DRAFT)
+
+  // ─── Basic info
+  make          String
+  model         String
+  subModel      String?          @map("sub_model")
+  year          Int
+  price         Int
+  originalPrice Int?             @map("original_price")
+
+  // ─── Specs
+  km            Int
+  hand          Int              @default(1)
+  fuelType      FuelType         @map("fuel_type")
+  transmission  TransmissionType @default(AUTOMATIC)
+  engineSize    Int?             @map("engine_size")
+  horsepower    Int?
+  color         String?
+  doors         Int?             @default(4)
+  seats         Int?             @default(5)
+
+  // ─── Israeli market
+  testDate      DateTime?        @map("test_date")
+  ownership     String?
+  city          String?
+  region        Region?
+
+  // ─── Calculated / Cached
+  fuelConsumption Float?         @map("fuel_consumption")
+  reliability     Int?
+
+  // ─── SEO + Discovery
+  slug          String           @unique
+  description   String?          @db.Text
+  categoryTag   String?          @map("category_tag")
+
+  // ─── Features
+  hasFinancing  Boolean          @default(false) @map("has_financing")
+  hasTradeIn    Boolean          @default(false) @map("has_trade_in")
+  hasWarranty   Boolean          @default(false) @map("has_warranty")
+
+  // ─── Stats (denormalized)
+  viewsCount    Int              @default(0) @map("views_count")
+  clicksCount   Int              @default(0) @map("clicks_count")
+  leadsCount    Int              @default(0) @map("leads_count")
+
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  dealer Dealer     @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  images CarImage[]
+  leads  Lead[]
+
+  @@index([status, year, price])
+  @@index([status, make, model])
+  @@index([dealerId, status])
+  @@map("cars")
+}
+
+model CarImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  carId     String   @map("car_id") @db.Uuid
+  url       String
+  order     Int      @default(0)
+  isPrimary Boolean  @default(false) @map("is_primary")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  car Car @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId, order])
+  @@map("car_images")
+}
+
+model Lead {
+  id         String     @id @default(uuid()) @db.Uuid
+  carId      String     @map("car_id") @db.Uuid
+  dealerId   String     @map("dealer_id") @db.Uuid
+  type       LeadType
+  status     LeadStatus @default(NEW)
+
+  // ─── Contact info
+  fullName   String     @map("full_name")
+  phone      String
+  email      String?
+  message    String?    @db.Text
+
+  // ─── Finance fields
+  downPayment Int?      @map("down_payment")
+  months      Int?
+
+  // ─── Insurance fields
+  driverAge   Int?      @map("driver_age")
+  youngDriver Boolean?  @map("young_driver")
+
+  // ─── Source
+  sourcePage  String?   @map("source_page")
+
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  car    Car        @relation(fields: [carId], references: [id], onDelete: Cascade)
+  dealer Dealer     @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  events LeadEvent[]
+
+  @@index([dealerId, status, createdAt])
+  @@index([carId])
+  @@map("leads")
+}
+
+model LeadEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  leadId    String   @map("lead_id") @db.Uuid
+  action    String
+  note      String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+  @@map("lead_events")
+}
