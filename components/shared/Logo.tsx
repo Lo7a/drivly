@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 interface LogoProps {
@@ -6,32 +5,27 @@ interface LogoProps {
 }
 
 export function Logo({ size = "md" }: LogoProps) {
-  const sizes = {
-    sm: { width: 120, height: 30 },
-    md: { width: 160, height: 40 },
-    lg: { width: 200, height: 50 },
+  const textSizes = {
+    sm: "text-lg",
+    md: "text-xl",
+    lg: "text-2xl",
   };
 
-  const { width, height } = sizes[size];
-
   return (
-    <Link href="/" className="block hover:opacity-80 transition-opacity">
-      <Image
-        src="/logo.svg"
-        alt="Drivly - רכבים למכירה"
-        width={width}
-        height={height}
-        priority
-        className="dark:hidden"
-      />
-      <Image
-        src="/logo-dark.svg"
-        alt="Drivly - רכבים למכירה"
-        width={width}
-        height={height}
-        priority
-        className="hidden dark:block"
-      />
+    <Link
+      href="/"
+      className="group flex items-center gap-2 hover:opacity-90 transition-opacity"
+    >
+      {/* Minimal geometric mark */}
+      <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary transition-transform group-hover:scale-105">
+        <span className="text-sm font-black text-primary-foreground tracking-tighter">
+          D
+        </span>
+      </div>
+      <span className={`${textSizes[size]} font-bold tracking-tight`}>
+        <span className="text-primary">Driv</span>
+        <span className="text-foreground">ly</span>
+      </span>
     </Link>
   );
 }
