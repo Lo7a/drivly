@@ -13,105 +13,155 @@ import {
   Mountain,
   ArrowLeft,
   CheckCircle2,
-  Sparkles,
+  TrendingDown,
+  Clock,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  students: <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6" />,
-  families: <Users className="h-5 w-5 sm:h-6 sm:w-6" />,
-  "large-families": <Baby className="h-5 w-5 sm:h-6 sm:w-6" />,
-  economical: <Leaf className="h-5 w-5 sm:h-6 sm:w-6" />,
-  luxury: <Gem className="h-5 w-5 sm:h-6 sm:w-6" />,
-  offroad: <Mountain className="h-5 w-5 sm:h-6 sm:w-6" />,
+  students: <GraduationCap className="h-5 w-5" />,
+  families: <Users className="h-5 w-5" />,
+  "large-families": <Baby className="h-5 w-5" />,
+  economical: <Leaf className="h-5 w-5" />,
+  luxury: <Gem className="h-5 w-5" />,
+  offroad: <Mountain className="h-5 w-5" />,
 };
 
 export default function HomePage() {
   return (
     <>
-      {/* ═══ Hero Section ═══ */}
-      <section className="relative overflow-hidden mesh-gradient">
-        {/* Decorative blurred circles */}
-        <div className="absolute -top-24 -end-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-24 -start-24 h-72 w-72 rounded-full bg-blue-400/10 blur-3xl" />
+      {/* ═══ HERO — Full-bleed immersive ═══ */}
+      <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden">
+        {/* Layered background */}
+        <div className="absolute inset-0 bg-gradient-to-bl from-slate-950 via-slate-900 to-cyan-950" />
+        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top_right,_hsl(192_80%_40%_/_0.4),_transparent_60%)]" />
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(192_80%_40%_/_0.3),_transparent_60%)]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:py-28 lg:py-36 text-center">
-          {/* Badge */}
-          <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary mb-6">
-            <Sparkles className="h-3.5 w-3.5" />
-            סוחרים מאומתים בכל הארץ
-          </div>
+        {/* Grid pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `linear-gradient(hsl(0 0% 100% / 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(0 0% 100% / 0.1) 1px, transparent 1px)`,
+            backgroundSize: "60px 60px",
+          }}
+        />
 
-          {/* Heading */}
-          <h1 className="animate-fade-up delay-100 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] mb-6">
-            מצאו את הרכב המושלם
-            <br />
-            <span className="bg-gradient-to-l from-cyan-700 via-primary to-teal-500 bg-clip-text text-transparent animate-gradient">
-              במחיר שמתאים לכם
-            </span>
-          </h1>
+        <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-20">
+          <div className="max-w-3xl">
+            {/* Eyebrow */}
+            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm text-cyan-300 mb-8">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              סוחרים מאומתים · עדכון יומי
+            </div>
 
-          {/* Subtitle */}
-          <p className="animate-fade-up delay-200 text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            השוו בין מאות רכבים, חשבו עלות חודשית אמיתית כולל מימון, ביטוח ודלק
-            — הכל במקום אחד ובחינם
-          </p>
+            {/* Headline — editorial style */}
+            <h1 className="animate-fade-up delay-150 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
+              הרכב הבא שלכם
+              <br />
+              <span className="bg-gradient-to-l from-cyan-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                מתחיל כאן.
+              </span>
+            </h1>
 
-          {/* Search Bar - Glassmorphism */}
-          <div className="animate-fade-up delay-300 max-w-2xl mx-auto mb-8">
-            <div className="glass rounded-2xl p-2 shadow-lg shadow-primary/5">
-              <SearchBar size="lg" />
+            <p className="animate-fade-up delay-300 text-base sm:text-lg text-slate-300 max-w-xl mb-10 leading-relaxed">
+              גלו את העלות החודשית
+              <span className="text-white font-semibold"> האמיתית </span>
+              של כל רכב — כולל מימון, ביטוח ודלק. לא הפתעות, לא אותיות קטנות.
+            </p>
+
+            {/* Search — prominent, glassmorphic */}
+            <div className="animate-fade-up delay-400 max-w-xl">
+              <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-2 shadow-2xl shadow-cyan-900/20">
+                <SearchBar size="lg" placeholder="חפשו יצרן, דגם או מחיר..." />
+              </div>
+            </div>
+
+            {/* Trust indicators */}
+            <div className="animate-fade-up delay-500 flex flex-wrap items-center gap-x-6 gap-y-2 mt-8 text-sm text-slate-400">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                ללא עמלות
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                סוחרים מאומתים
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                מחשבון מימון חכם
+              </span>
             </div>
           </div>
 
-          {/* Quick stats */}
-          <div className="animate-fade-up delay-400 flex items-center justify-center gap-6 sm:gap-10 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-              <span>סוחרים מאומתים</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-              <span>ללא עמלות</span>
-            </div>
-            <div className="hidden sm:flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-              <span>מחשבון מימון חכם</span>
-            </div>
+          {/* Stats — floating on the right side (desktop) */}
+          <div className="hidden lg:flex absolute end-8 top-1/2 -translate-y-1/2 flex-col gap-4 w-56">
+            {[
+              { num: "1,200+", label: "רכבים במערכת", icon: Car },
+              { num: "98%", label: "שביעות רצון", icon: Star },
+              { num: "24 שעות", label: "זמן תגובה", icon: Clock },
+            ].map(({ num, label, icon: Icon }, i) => (
+              <div
+                key={i}
+                className="animate-fade-up rounded-xl bg-white/5 backdrop-blur border border-white/10 p-4 hover:bg-white/10 transition-colors"
+                style={{ animationDelay: `${500 + i * 100}ms` }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/20">
+                    <Icon className="h-5 w-5 text-cyan-400" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-white">{num}</p>
+                    <p className="text-xs text-slate-400">{label}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* Bottom fade to white */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
       </section>
 
-      {/* ═══ Categories ═══ */}
-      <section className="py-16 sm:py-20">
+      {/* ═══ CATEGORIES — Horizontal scroll on mobile, grid on desktop ═══ */}
+      <section className="py-14 sm:py-20 -mt-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-              מה אתם מחפשים?
-            </h2>
-            <p className="text-muted-foreground">
-              בחרו קטגוריה ונמצא לכם את הרכב המושלם
-            </p>
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-2">
+                קטגוריות
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-bold">
+                מה מתאים לכם?
+              </h2>
+            </div>
+            <Link
+              href="/search"
+              className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              כל הרכבים
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-            {CATEGORY_TAGS.map((category, index) => (
+          {/* Horizontal scroll mobile, grid desktop */}
+          <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:overflow-visible sm:pb-0">
+            {CATEGORY_TAGS.map((category) => (
               <Link
                 key={category.value}
                 href={`/search?category=${category.value}`}
-                className="card-glow group flex flex-col items-center gap-3 rounded-2xl border border-border/60 bg-card p-5 sm:p-6 text-center transition-all duration-300"
-                style={{ animationDelay: `${index * 80}ms` }}
+                className="card-hover group flex-shrink-0 w-36 sm:w-auto snap-start flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5 text-center"
               >
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary group-hover:from-primary group-hover:to-blue-600 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/8 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/25 group-hover:scale-110">
                   {CATEGORY_ICONS[category.value] || (
-                    <Car className="h-5 w-5 sm:h-6 sm:w-6" />
+                    <Car className="h-5 w-5" />
                   )}
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold mb-0.5">
-                    {category.label}
-                  </h3>
-                  <p className="text-[11px] sm:text-xs text-muted-foreground leading-tight">
+                  <h3 className="text-sm font-semibold">{category.label}</h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">
                     {category.description}
                   </p>
                 </div>
@@ -121,85 +171,144 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ "How Much Does It Really Cost?" ═══ */}
-      <section className="relative py-16 sm:py-24 overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-muted/50 via-muted/30 to-background" />
-        <div className="absolute inset-0 noise" />
+      {/* ═══ "REAL COST" — The differentiator, editorial layout ═══ */}
+      <section className="relative py-16 sm:py-24">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/40 to-background" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary mb-4">
-              <Calculator className="h-3.5 w-3.5" />
-              כלי חישוב חכם
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3">
-              כמה זה{" "}
-              <span className="text-primary">עולה באמת?</span>
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              לא רק מחיר הרכב — גלו את העלות החודשית האמיתית
-              כולל כל ההוצאות
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 max-w-4xl mx-auto">
-            {/* Finance Card */}
-            <div className="card-glow group rounded-2xl border border-border/60 bg-card p-6 sm:p-8 text-center">
-              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-600/5 group-hover:from-blue-500 group-hover:to-blue-600 transition-all duration-500">
-                <Calculator className="h-7 w-7 text-blue-500 group-hover:text-white transition-colors duration-500" />
-              </div>
-              <h3 className="text-lg font-bold mb-2">מחשבון מימון</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                חשבו תשלום חודשי מדויק לפי מקדמה, תקופה וריבית
+          {/* Two-column editorial layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Left: Content */}
+            <div>
+              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-3">
+                הפיצ&apos;ר שלנו
               </p>
-            </div>
-
-            {/* Insurance Card */}
-            <div className="card-glow group rounded-2xl border border-border/60 bg-card p-6 sm:p-8 text-center">
-              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 group-hover:from-emerald-500 group-hover:to-emerald-600 transition-all duration-500">
-                <Shield className="h-7 w-7 text-emerald-500 group-hover:text-white transition-colors duration-500" />
-              </div>
-              <h3 className="text-lg font-bold mb-2">הערכת ביטוח</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                קבלו הערכה לעלות ביטוח חודשית לפי גיל הנהג וסוג הרכב
+              <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-5">
+                כמה זה עולה
+                <br />
+                <span className="text-primary">באמת?</span>
+              </h2>
+              <p className="text-muted-foreground leading-relaxed mb-8 max-w-md">
+                המחיר על השלט זה רק ההתחלה. אנחנו מחשבים עבורכם את העלות
+                החודשית המלאה — כדי שתדעו בדיוק מה מחכה לכם.
               </p>
-            </div>
 
-            {/* Fuel Card */}
-            <div className="card-glow group rounded-2xl border border-border/60 bg-card p-6 sm:p-8 text-center">
-              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 group-hover:from-amber-500 group-hover:to-amber-600 transition-all duration-500">
-                <Fuel className="h-7 w-7 text-amber-500 group-hover:text-white transition-colors duration-500" />
+              {/* Feature list */}
+              <div className="space-y-4">
+                {[
+                  {
+                    icon: Calculator,
+                    title: "מחשבון מימון",
+                    desc: "תשלום חודשי מדויק לפי מקדמה וריבית",
+                    color: "text-cyan-500 bg-cyan-500/10",
+                  },
+                  {
+                    icon: Shield,
+                    title: "הערכת ביטוח",
+                    desc: "עלות ביטוח משוערת לפי גיל וסוג רכב",
+                    color: "text-emerald-500 bg-emerald-500/10",
+                  },
+                  {
+                    icon: Fuel,
+                    title: "עלות דלק",
+                    desc: "צריכה חודשית לפי ק״מ וסוג מנוע",
+                    color: "text-amber-500 bg-amber-500/10",
+                  },
+                ].map(({ icon: Icon, title, desc, color }) => (
+                  <div
+                    key={title}
+                    className="flex items-start gap-4 p-4 rounded-xl hover:bg-card hover:shadow-sm transition-all border border-transparent hover:border-border"
+                  >
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm">{title}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <h3 className="text-lg font-bold mb-2">עלות דלק</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                חשבו כמה תוציאו על דלק כל חודש לפי צריכת הרכב
-              </p>
             </div>
-          </div>
 
-          {/* Example cost breakdown */}
-          <div className="mt-12 max-w-lg mx-auto">
-            <div className="glass rounded-2xl p-6 shadow-xl shadow-primary/5">
-              <h4 className="text-sm font-semibold text-center mb-4 text-muted-foreground">
-                דוגמה: טויוטה קורולה 2023
-              </h4>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">מימון חודשי</span>
-                  <span className="font-semibold">~1,200₪</span>
+            {/* Right: Interactive cost card */}
+            <div className="relative">
+              {/* Glow behind card */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 via-cyan-400/10 to-transparent blur-2xl scale-110" />
+
+              <div className="relative rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xl">
+                {/* Card header */}
+                <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+                  <div>
+                    <h4 className="font-bold">טויוטה קורולה 2023</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      32,000 ק&quot;מ · יד ראשונה · אוטומט
+                    </p>
+                  </div>
+                  <div className="text-left">
+                    <p className="text-2xl font-bold text-primary">115,000₪</p>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">ביטוח חודשי</span>
-                  <span className="font-semibold">~350₪</span>
+
+                {/* Cost breakdown */}
+                <div className="space-y-4 mb-6">
+                  {[
+                    {
+                      label: "מימון חודשי",
+                      amount: "1,200₪",
+                      bar: "w-[65%]",
+                      color: "bg-cyan-500",
+                    },
+                    {
+                      label: "ביטוח חודשי",
+                      amount: "350₪",
+                      bar: "w-[25%]",
+                      color: "bg-emerald-500",
+                    },
+                    {
+                      label: "דלק חודשי",
+                      amount: "600₪",
+                      bar: "w-[40%]",
+                      color: "bg-amber-500",
+                    },
+                  ].map(({ label, amount, bar, color }) => (
+                    <div key={label}>
+                      <div className="flex items-center justify-between text-sm mb-1.5">
+                        <span className="text-muted-foreground">{label}</span>
+                        <span className="font-semibold">{amount}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${color} ${bar} transition-all duration-1000`}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">דלק חודשי</span>
-                  <span className="font-semibold">~600₪</span>
+
+                {/* Total */}
+                <div className="rounded-xl bg-primary/5 border border-primary/10 p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      סה&quot;כ עלות חודשית
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      כולל מימון + ביטוח + דלק
+                    </p>
+                  </div>
+                  <p className="text-3xl font-bold text-primary">2,150₪</p>
                 </div>
-                <div className="border-t border-border pt-3 flex items-center justify-between">
-                  <span className="font-bold">סה&quot;כ חודשי</span>
-                  <span className="text-xl font-bold text-primary">~2,150₪</span>
+
+                {/* Savings hint */}
+                <div className="mt-4 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+                  <TrendingDown className="h-3.5 w-3.5" />
+                  <span>
+                    זול ב-15% מהממוצע בקטגוריה
+                  </span>
                 </div>
               </div>
             </div>
@@ -207,73 +316,113 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ Featured Cars ═══ */}
-      <section className="py-16 sm:py-20">
+      {/* ═══ FEATURED CARS — Asymmetric, editorial ═══ */}
+      <section className="py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-2">
+                חדש במערכת
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-bold">
                 רכבים מובילים
               </h2>
-              <p className="text-muted-foreground text-sm">
-                הרכבים הפופולריים ביותר במערכת
-              </p>
             </div>
             <Link
               href="/search"
-              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
             >
               הצגת הכל
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </div>
 
-          {/* Placeholder cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          {/* Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { make: "טויוטה", model: "קורולה", year: 2023, price: "115,000₪", km: "32,000", hand: 1 },
-              { make: "יונדאי", model: "טוסון", year: 2022, price: "145,000₪", km: "48,000", hand: 1 },
-              { make: "מאזדה", model: "CX-5", year: 2023, price: "165,000₪", km: "25,000", hand: 1 },
+              {
+                make: "טויוטה",
+                model: "קורולה",
+                year: 2023,
+                price: "115,000₪",
+                km: "32,000",
+                hand: 1,
+                fuel: "בנזין",
+                monthly: "~2,150₪",
+              },
+              {
+                make: "יונדאי",
+                model: "טוסון",
+                year: 2022,
+                price: "145,000₪",
+                km: "48,000",
+                hand: 1,
+                fuel: "היברידי",
+                monthly: "~2,800₪",
+              },
+              {
+                make: "מאזדה",
+                model: "CX-5",
+                year: 2023,
+                price: "165,000₪",
+                km: "25,000",
+                hand: 1,
+                fuel: "בנזין",
+                monthly: "~3,100₪",
+              },
             ].map((car, i) => (
               <div
                 key={i}
-                className="card-glow group overflow-hidden rounded-2xl border border-border/60 bg-card"
+                className="card-hover group overflow-hidden rounded-2xl border border-border bg-card"
               >
-                {/* Image placeholder */}
-                <div className="relative aspect-[16/10] bg-gradient-to-br from-muted to-muted/50 overflow-hidden">
+                {/* Image area */}
+                <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 overflow-hidden">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Car className="h-16 w-16 text-muted-foreground/15 group-hover:scale-110 transition-transform duration-500" />
+                    <Car className="h-20 w-20 text-muted-foreground/10 group-hover:scale-110 transition-transform duration-700" />
                   </div>
-                  <div className="absolute bottom-3 start-3 rounded-lg glass px-3 py-1.5 shadow-sm">
-                    <span className="text-lg font-bold text-primary">{car.price}</span>
+
+                  {/* Price chip */}
+                  <div className="absolute bottom-3 start-3 glass rounded-lg px-3 py-1.5 shadow-lg">
+                    <span className="text-lg font-bold">{car.price}</span>
                   </div>
-                  <div className="absolute top-3 start-3 rounded-lg bg-foreground/80 text-background px-2.5 py-1 text-xs font-medium">
+
+                  {/* Hand badge */}
+                  <div className="absolute top-3 start-3 rounded-md bg-foreground/80 text-background px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
                     יד {car.hand}
+                  </div>
+
+                  {/* Monthly estimate chip */}
+                  <div className="absolute top-3 end-3 rounded-md bg-primary/90 text-primary-foreground px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
+                    {car.monthly}/חודש
                   </div>
                 </div>
 
                 {/* Details */}
                 <div className="p-5">
-                  <h3 className="font-bold text-base mb-3 group-hover:text-primary transition-colors">
+                  <h3 className="font-bold text-base mb-2 group-hover:text-primary transition-colors">
                     {car.make} {car.model} {car.year}
                   </h3>
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span>{car.km} ק&quot;מ</span>
-                    <span>•</span>
-                    <span>אוטומט</span>
-                    <span>•</span>
-                    <span>בנזין</span>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {[`${car.km} ק"מ`, "אוטומט", car.fuel].map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex rounded-md bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Mobile "show all" link */}
+          {/* Mobile link */}
           <div className="sm:hidden mt-6 text-center">
             <Link
               href="/search"
-              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary"
             >
               הצגת כל הרכבים
               <ArrowLeft className="h-4 w-4" />
@@ -282,46 +431,61 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ Dealer CTA ═══ */}
-      <section className="relative py-16 sm:py-24 overflow-hidden">
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-        <div className="absolute inset-0 noise" />
-
-        {/* Decorative elements */}
-        <div className="absolute top-0 end-0 w-72 h-72 rounded-full bg-white/5 blur-2xl" />
-        <div className="absolute bottom-0 start-0 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
+      {/* ═══ DEALER CTA — Bold, dark, confident ═══ */}
+      <section className="relative py-20 sm:py-28 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950" />
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_hsl(192_80%_40%_/_0.3),_transparent_70%)]" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto text-center text-white">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-4 py-1.5 text-xs font-medium mb-6">
-              <Sparkles className="h-3.5 w-3.5" />
-              הצטרפו בחינם
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
-              סוחר רכבים?
-              <br />
-              הגיעו ללקוחות חדשים
-            </h2>
-            <p className="text-white/70 mb-10 text-base sm:text-lg leading-relaxed">
-              העלו את הרכבים שלכם בחינם והגיעו לאלפי לקוחות פוטנציאליים.
-              <br className="hidden sm:block" />
-              הרשמה פשוטה תוך דקה.
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Content */}
+            <div>
+              <p className="text-xs font-semibold text-cyan-400 uppercase tracking-widest mb-4">
+                לסוחרי רכב
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight mb-5">
+                הגיעו לאלפי
+                <br />
+                לקוחות חדשים
+              </h2>
+              <p className="text-slate-400 leading-relaxed mb-8 max-w-md">
+                העלו את הרכבים שלכם בחינם. בלי עמלות, בלי התחייבות.
+                הרשמה פשוטה תוך דקה אחת.
+              </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/register"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white text-primary px-8 py-3.5 text-sm font-bold hover:bg-white/90 transition-all shadow-lg shadow-black/10 hover:shadow-xl hover:-translate-y-0.5"
-              >
-                הרשמה כסוחר
-              </Link>
-              <Link
-                href="/login"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-3.5 text-sm font-medium hover:bg-white/20 transition-all"
-              >
-                כניסה למערכת
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/register"
+                  className="inline-flex items-center justify-center rounded-xl bg-white text-slate-900 px-7 py-3.5 text-sm font-bold hover:bg-white/90 transition-all shadow-lg shadow-black/20 hover:shadow-xl hover:-translate-y-0.5"
+                >
+                  הרשמה כסוחר
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center justify-center rounded-xl bg-white/10 backdrop-blur border border-white/15 text-white px-7 py-3.5 text-sm font-medium hover:bg-white/20 transition-all"
+                >
+                  כניסה למערכת
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: Benefits */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { num: "0₪", label: "עלות הרשמה", sub: "חינם לגמרי" },
+                { num: "24/7", label: "חשיפה", sub: "הרכבים שלכם תמיד נראים" },
+                { num: "100%", label: "ניהול עצמאי", sub: "העלאה ועריכה בקליק" },
+                { num: "∞", label: "רכבים", sub: "ללא הגבלת כמות" },
+              ].map(({ num, label, sub }) => (
+                <div
+                  key={label}
+                  className="rounded-xl bg-white/5 backdrop-blur border border-white/10 p-5 hover:bg-white/10 transition-colors"
+                >
+                  <p className="text-2xl font-bold text-cyan-400 mb-1">{num}</p>
+                  <p className="text-sm font-medium text-white">{label}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{sub}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

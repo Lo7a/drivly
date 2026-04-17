@@ -105,6 +105,11 @@ body {
 
 html[dir="rtl"] { text-align: right; }
 
+a, button, [role="button"], input[type="submit"],
+input[type="button"], select, label[for], .cursor-pointer {
+  cursor: pointer;
+}
+
 ::selection {
   background: hsl(var(--primary) / 0.15);
   color: hsl(var(--foreground));
