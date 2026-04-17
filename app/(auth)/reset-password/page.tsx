@@ -3,18 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Mail, ArrowRight, CheckCircle } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+
+  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    // TODO: Supabase password reset
-    await new Promise((r) => setTimeout(r, 1000));
-    setSent(true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/dealer/dashboard`,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setSent(true);
+    }
     setLoading(false);
   };
 
@@ -47,6 +59,12 @@ export default function ResetPasswordPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-6 sm:p-8 space-y-5">
+        {error && (
+          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+            {error}
+          </div>
+        )}
+
         <div>
           <label className="text-xs font-medium text-white/50 mb-1.5 block">אימייל</label>
           <div className="relative">
