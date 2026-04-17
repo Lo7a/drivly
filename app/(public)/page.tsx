@@ -1,4 +1,5 @@
 import { SearchBar } from "@/components/shared/SearchBar";
+import { HeroParticles } from "@/components/shared/HeroParticles";
 import { CATEGORY_TAGS } from "@/lib/constants";
 import {
   Car,
@@ -57,6 +58,9 @@ export default function HomePage() {
 
         {/* Diagonal light streak */}
         <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(135deg,_transparent_40%,_hsl(192_80%_70%_/_0.3)_50%,_transparent_60%)]" />
+
+        {/* Interactive particles */}
+        <HeroParticles />
 
         <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-20">
           <div className="max-w-3xl">
