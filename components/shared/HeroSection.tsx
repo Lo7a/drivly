@@ -32,11 +32,13 @@ export function HeroSection() {
       {/* תמונת רקע */}
       <div className="absolute inset-0">
         <Image
-          src="/hero-bg.png"
+          src="/hero-bg.webp"
           alt="רכב יוקרה על במת תצוגה"
           fill
           priority
-          unoptimized
+          quality={85}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAAAwAwCdASoUAAoAPzmEuVOvKKWisAgB4CcJYwC06CHDI6YAAP7l5KN8Vmo2x9zXLMVsrslN6TnCZlqdp9OIQwz77ScAAA=="
           className="object-cover object-left sm:object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-l from-[#050816]/90 via-[#050816]/40 to-transparent" />
