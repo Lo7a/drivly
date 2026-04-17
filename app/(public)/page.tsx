@@ -1,5 +1,5 @@
 import { SearchBar } from "@/components/shared/SearchBar";
-import { HeroInteractive } from "@/components/shared/HeroInteractive";
+import { HeroBackground } from "@/components/shared/HeroBackground";
 import { CATEGORY_TAGS } from "@/lib/constants";
 import {
   Car,
@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <>
       {/* ═══ HERO — Full-screen car image, interactive ═══ */}
-      <HeroInteractive>
+      <HeroBackground>
         <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8">
           {/* Headline — big, cinematic */}
           <h1 className="animate-fade-up text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-5 max-w-3xl">
@@ -73,7 +73,7 @@ export default function HomePage() {
             </span>
           </div>
         </div>
-      </HeroInteractive>
+      </HeroBackground>
 
       {/* ═══ CATEGORIES — Horizontal scroll on mobile, grid on desktop ═══ */}
       <section className="py-14 sm:py-20 -mt-8">
