@@ -9,7 +9,6 @@ type Env = {
 };
 
 export default defineConfig({
-  earlyAccess: true,
   schema: path.join("prisma", "schema.prisma"),
   migrate: {
     url: env<Env>("DIRECT_URL"),
