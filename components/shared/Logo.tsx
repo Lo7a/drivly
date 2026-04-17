@@ -2,9 +2,10 @@ import Link from "next/link";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
+  variant?: "light" | "auto";
 }
 
-export function Logo({ size = "md" }: LogoProps) {
+export function Logo({ size = "md", variant = "auto" }: LogoProps) {
   const config = {
     sm: { mark: "h-7 w-7 text-xs", text: "text-lg" },
     md: { mark: "h-8 w-8 text-sm", text: "text-xl" },
@@ -12,6 +13,7 @@ export function Logo({ size = "md" }: LogoProps) {
   };
 
   const { mark, text } = config[size];
+  const textColor = variant === "light" ? "text-white" : "text-foreground";
 
   return (
     <Link
@@ -24,7 +26,7 @@ export function Logo({ size = "md" }: LogoProps) {
         D
       </div>
       <span className={`${text} font-bold tracking-tight`}>
-        <span className="text-foreground">Driv</span>
+        <span className={textColor}>Driv</span>
         <span className="text-primary">ly</span>
       </span>
     </Link>

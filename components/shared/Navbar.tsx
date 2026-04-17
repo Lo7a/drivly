@@ -2,71 +2,83 @@
 
 import { Logo } from "@/components/shared/Logo";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
-import { Search, Menu, X } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+
+const NAV_LINKS = [
+  { href: "/", label: "בית" },
+  { href: "/search", label: "כל הרכבים" },
+  { href: "/login", label: "לסוחרים" },
+  { href: "#how", label: "איך זה עובד" },
+  { href: "#contact", label: "צור קשר" },
+];
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Logo size="md" />
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#050816]/90 backdrop-blur-xl border-b border-white/[0.06]">
+      <nav className="mx-auto flex h-16 sm:h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Logo size="md" variant="light" />
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-6">
-          <Link
-            href="/search"
-            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Search className="h-4 w-4" />
-            חיפוש רכבים
-          </Link>
+        <div className="hidden lg:flex items-center gap-1">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="px-4 py-2 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="hidden lg:flex items-center gap-3">
           <ThemeToggle />
           <Link
             href="/login"
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20"
+            className="inline-flex items-center gap-2 rounded-xl bg-white/[0.06] backdrop-blur border border-white/15 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/[0.12] transition-all"
           >
-            כניסת סוחרים
+            <User className="h-4 w-4" />
+            אזור סוחרים
           </Link>
         </div>
 
-        {/* Mobile: Theme + Menu */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="flex lg:hidden items-center gap-2">
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-accent transition-colors"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] hover:bg-white/[0.12] transition-colors"
             aria-label={mobileMenuOpen ? "סגור תפריט" : "פתח תפריט"}
           >
             {mobileMenuOpen ? (
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5 text-white" />
             ) : (
-              <Menu className="h-4 w-4" />
+              <Menu className="h-5 w-5 text-white" />
             )}
           </button>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-3">
-          <Link
-            href="/search"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-          >
-            <Search className="h-4 w-4" />
-            חיפוש רכבים
-          </Link>
+        <div className="lg:hidden bg-[#0b1220]/95 backdrop-blur-xl border-t border-white/[0.06] px-4 py-4 space-y-1">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-4 py-3 text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
           <Link
             href="/login"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="block rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground text-center mt-2"
           >
-            כניסת סוחרים
+            אזור סוחרים
           </Link>
         </div>
       )}
