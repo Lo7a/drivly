@@ -2,7 +2,6 @@
 
 import { Logo } from "@/components/shared/Logo";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
-import { ThemeSwitcher } from "@/components/shared/ThemeSwitcher";
 import { Search, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -25,7 +24,6 @@ export function Navbar() {
             <Search className="h-4 w-4" />
             חיפוש רכבים
           </Link>
-          <ThemeSwitcher />
           <ThemeToggle />
           <Link
             href="/login"

@@ -46,7 +46,7 @@ export default function HomePage() {
           <h1 className="animate-fade-up delay-100 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] mb-6">
             מצאו את הרכב המושלם
             <br />
-            <span className="bg-gradient-to-l from-blue-600 via-primary to-blue-400 bg-clip-text text-transparent animate-gradient">
+            <span className="bg-gradient-to-l from-cyan-700 via-primary to-teal-500 bg-clip-text text-transparent animate-gradient">
               במחיר שמתאים לכם
             </span>
           </h1>
@@ -285,12 +285,12 @@ export default function HomePage() {
       {/* ═══ Dealer CTA ═══ */}
       <section className="relative py-16 sm:py-24 overflow-hidden">
         {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-blue-600 to-blue-700" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
         <div className="absolute inset-0 noise" />
 
         {/* Decorative elements */}
         <div className="absolute top-0 end-0 w-72 h-72 rounded-full bg-white/5 blur-2xl" />
-        <div className="absolute bottom-0 start-0 w-96 h-96 rounded-full bg-blue-400/10 blur-3xl" />
+        <div className="absolute bottom-0 start-0 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center text-white">
