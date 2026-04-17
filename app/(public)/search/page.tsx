@@ -1,12 +1,24 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Car } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Search,
+  Home,
+  ChevronLeft,
+  SearchX,
+} from "lucide-react";
 import { CarCard } from "@/components/shared/CarCard";
 import { FilterSidebar } from "@/components/shared/FilterSidebar";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SITE_NAME, CAR_MAKES, FUEL_TYPES, REGIONS, CATEGORY_TAGS } from "@/lib/constants";
+import {
+  SITE_NAME,
+  CAR_MAKES,
+  FUEL_TYPES,
+  REGIONS,
+  CATEGORY_TAGS,
+} from "@/lib/constants";
 import { searchParamsSchema, type SearchParams } from "@/lib/validators";
 import type { FuelType, Region } from "@prisma/client";
 
@@ -57,38 +69,38 @@ const MOCK_CARS: Array<{
 
 const ITEMS_PER_PAGE = 12;
 
-// ─── Sort Options ───────────────────────────────────────
-
 const SORT_OPTIONS = [
   { value: "newest", label: "החדשים ביותר" },
-  { value: "price-asc", label: "מחיר: מהנמוך לגבוה" },
-  { value: "price-desc", label: "מחיר: מהגבוה לנמוך" },
-  { value: "year-desc", label: "שנה: מהחדש לישן" },
-  { value: "km-asc", label: 'ק"מ: מהנמוך לגבוה' },
+  { value: "price-asc", label: "מחיר: נמוך לגבוה" },
+  { value: "price-desc", label: "מחיר: גבוה לנמוך" },
+  { value: "year-desc", label: "שנה: חדש לישן" },
+  { value: "km-asc", label: 'ק"מ: נמוך לגבוה' },
 ];
 
 // ─── Helpers ────────────────────────────────────────────
 
-function buildActiveTagsLabel(filters: SearchParams): string[] {
-  const tags: string[] = [];
+function buildActiveTagsLabel(
+  filters: SearchParams
+): { key: string; label: string }[] {
+  const tags: { key: string; label: string }[] = [];
   if (filters.make) {
     const found = CAR_MAKES.find((m) => m.value === filters.make);
-    if (found) tags.push(found.label);
+    if (found) tags.push({ key: "make", label: found.label });
   }
-  if (filters.model) tags.push(filters.model);
+  if (filters.model) tags.push({ key: "model", label: filters.model });
   if (filters.fuelType) {
     const label = FUEL_TYPES[filters.fuelType as keyof typeof FUEL_TYPES];
-    if (label) tags.push(label);
+    if (label) tags.push({ key: "fuelType", label });
   }
   if (filters.region) {
     const label = REGIONS[filters.region as keyof typeof REGIONS];
-    if (label) tags.push(label);
+    if (label) tags.push({ key: "region", label });
   }
   if (filters.category) {
     const cat = CATEGORY_TAGS.find((c) => c.value === filters.category);
-    if (cat) tags.push(cat.label);
+    if (cat) tags.push({ key: "category", label: cat.label });
   }
-  if (filters.q) tags.push(`"${filters.q}"`);
+  if (filters.q) tags.push({ key: "q", label: `"${filters.q}"` });
   return tags;
 }
 
@@ -136,7 +148,6 @@ function filterMockCars(filters: SearchParams) {
     cars = cars.filter((c) => c.categoryTag === filters.category);
   }
 
-  // Sort
   switch (filters.sort) {
     case "price-asc":
       cars.sort((a, b) => a.price - b.price);
@@ -151,7 +162,6 @@ function filterMockCars(filters: SearchParams) {
       cars.sort((a, b) => a.km - b.km);
       break;
     default:
-      // newest first (by year desc then km asc)
       cars.sort((a, b) => b.year - a.year || a.km - b.km);
   }
 
@@ -166,7 +176,6 @@ export default async function SearchPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const rawParams = await searchParams;
-  // Flatten arrays to single values
   const flat: Record<string, string> = {};
   for (const [key, val] of Object.entries(rawParams)) {
     if (typeof val === "string") flat[key] = val;
@@ -178,93 +187,172 @@ export default async function SearchPage({
   const totalCount = allCars.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
   const page = Math.min(filters.page, totalPages);
-  const cars = allCars.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  const cars = allCars.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
   const activeTags = buildActiveTagsLabel(filters);
 
   return (
-    <div className="min-h-[80dvh] pb-16">
-      {/* ─── Page Header ─── */}
-      <div className="border-b border-border bg-card/50 pt-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="min-h-[80dvh]">
+      {/* ═══ Dark Hero Header ═══ */}
+      <section className="relative overflow-hidden bg-[#050816] pt-24 pb-10 sm:pt-28 sm:pb-14">
+        {/* Background effects */}
+        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(ellipse_at_70%_20%,_hsl(192_80%_40%_/_0.15),_transparent_60%)]" />
+        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_20%_80%,_hsl(220_60%_50%_/_0.1),_transparent_60%)]" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
-            <Link href="/" className="hover:text-foreground transition-colors">
+          <nav className="flex items-center gap-2 text-xs text-white/40 mb-6 animate-fade-in">
+            <Link
+              href="/"
+              className="flex items-center gap-1 hover:text-white/70 transition-colors"
+            >
+              <Home className="h-3 w-3" />
               ראשי
             </Link>
-            <span>/</span>
-            <span className="text-foreground">חיפוש רכבים</span>
+            <ChevronLeft className="h-3 w-3 rtl:rotate-180" />
+            <span className="text-white/70">חיפוש רכבים</span>
           </nav>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">חיפוש רכבים</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {totalCount > 0
-                  ? `נמצאו ${totalCount} רכבים`
-                  : "לא נמצאו רכבים מתאימים"}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
+            <div className="animate-fade-up">
+              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+                חיפוש <span className="text-cyan-400">רכבים</span>
+              </h1>
+              <p className="mt-2 text-sm text-white/50">
+                {totalCount > 0 ? (
+                  <>
+                    נמצאו{" "}
+                    <span className="text-cyan-400 font-semibold">
+                      {totalCount}
+                    </span>{" "}
+                    רכבים מתאימים
+                  </>
+                ) : (
+                  "לא נמצאו רכבים מתאימים לחיפוש"
+                )}
               </p>
             </div>
 
-            {/* Sort */}
-            <SortSelect currentSort={filters.sort || "newest"} searchParams={flat} />
+            {/* Sort Pills */}
+            <div className="animate-fade-up delay-150">
+              <SortSelect
+                currentSort={filters.sort || "newest"}
+                searchParams={flat}
+              />
+            </div>
           </div>
 
-          {/* Active Filter Tags */}
+          {/* Active Filters */}
           {activeTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-wrap items-center gap-2 mt-5 animate-fade-up delay-200">
+              <span className="text-[11px] text-white/30 font-medium">
+                פילטרים:
+              </span>
               {activeTags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="text-xs px-2.5 py-1"
-                >
-                  {tag}
-                </Badge>
+                <RemovableTag
+                  key={tag.key}
+                  label={tag.label}
+                  paramKey={tag.key}
+                  searchParams={flat}
+                />
               ))}
+              {activeTags.length > 1 && (
+                <Link
+                  href="/search"
+                  className="text-[11px] text-white/40 hover:text-cyan-400 transition-colors underline underline-offset-2"
+                >
+                  נקה הכל
+                </Link>
+              )}
             </div>
           )}
         </div>
-      </div>
 
-      {/* ─── Main Content ─── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
-        <div className="flex gap-6 lg:gap-8">
-          {/* Sidebar */}
-          <Suspense fallback={<FilterSidebarSkeleton />}>
-            <FilterSidebar />
-          </Suspense>
+        {/* Bottom edge gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-l from-transparent via-cyan-500/20 to-transparent" />
+      </section>
 
-          {/* Results */}
-          <div className="flex-1 min-w-0">
+      {/* ═══ Main Content ═══ */}
+      <section className="relative pb-16">
+        <div className="absolute inset-0 mesh-gradient pointer-events-none" />
 
-            {cars.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-                  {cars.map((car) => (
-                    <CarCard key={car.slug} {...car} />
-                  ))}
-                </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
+          <div className="flex gap-6 lg:gap-8">
+            {/* Sidebar */}
+            <Suspense fallback={<FilterSidebarSkeleton />}>
+              <FilterSidebar />
+            </Suspense>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <Pagination
-                    currentPage={page}
-                    totalPages={totalPages}
-                    searchParams={flat}
-                  />
-                )}
-              </>
-            ) : (
-              <EmptyState hasFilters={activeTags.length > 0} />
-            )}
+            {/* Results */}
+            <div className="flex-1 min-w-0">
+              {cars.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+                    {cars.map((car, i) => (
+                      <div
+                        key={car.slug}
+                        className="animate-fade-up"
+                        style={{ animationDelay: `${i * 50}ms` }}
+                      >
+                        <CarCard {...car} />
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="text-center text-xs text-muted-foreground mt-8">
+                    מציג {(page - 1) * ITEMS_PER_PAGE + 1}–
+                    {Math.min(page * ITEMS_PER_PAGE, totalCount)} מתוך{" "}
+                    {totalCount} רכבים
+                  </p>
+
+                  {totalPages > 1 && (
+                    <Pagination
+                      currentPage={page}
+                      totalPages={totalPages}
+                      searchParams={flat}
+                    />
+                  )}
+                </>
+              ) : (
+                <EmptyState hasFilters={activeTags.length > 0} />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
 
 // ─── Sub-Components ─────────────────────────────────────
+
+function RemovableTag({
+  label,
+  paramKey,
+  searchParams,
+}: {
+  label: string;
+  paramKey: string;
+  searchParams: Record<string, string>;
+}) {
+  const params = new URLSearchParams(searchParams);
+  params.delete(paramKey);
+  params.delete("page");
+
+  return (
+    <Link
+      href={`/search?${params.toString()}`}
+      className="group inline-flex items-center gap-1.5 rounded-full bg-white/[0.08] border border-white/10 px-3 py-1 text-xs text-white/70 hover:bg-white/[0.12] hover:border-cyan-500/30 transition-all"
+    >
+      {label}
+      <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white/10 group-hover:bg-red-500/80 group-hover:text-white transition-all">
+        <span className="text-[8px] leading-none">&times;</span>
+      </span>
+    </Link>
+  );
+}
 
 function SortSelect({
   currentSort,
@@ -276,26 +364,25 @@ function SortSelect({
   function buildSortUrl(sort: string) {
     const params = new URLSearchParams(searchParams);
     params.delete("page");
-    if (sort === "newest") {
-      params.delete("sort");
-    } else {
-      params.set("sort", sort);
-    }
+    if (sort === "newest") params.delete("sort");
+    else params.set("sort", sort);
     return `/search?${params.toString()}`;
   }
 
   return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="text-muted-foreground shrink-0">מיון:</span>
+    <div className="flex items-center gap-3">
+      <span className="text-sm text-white/40 font-semibold shrink-0">
+        מיון:
+      </span>
       <div className="flex flex-wrap gap-1.5">
         {SORT_OPTIONS.map((opt) => (
           <Link
             key={opt.value}
             href={buildSortUrl(opt.value)}
-            className={`rounded-md px-2.5 py-1 text-xs transition-colors ${
+            className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
               currentSort === opt.value
-                ? "bg-primary text-primary-foreground font-medium"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/25"
+                : "bg-white/[0.06] text-white/50 border border-white/[0.08] hover:bg-white/[0.1] hover:text-white/70"
             }`}
           >
             {opt.label}
@@ -317,15 +404,11 @@ function Pagination({
 }) {
   function buildPageUrl(page: number) {
     const params = new URLSearchParams(searchParams);
-    if (page > 1) {
-      params.set("page", String(page));
-    } else {
-      params.delete("page");
-    }
+    if (page > 1) params.set("page", String(page));
+    else params.delete("page");
     return `/search?${params.toString()}`;
   }
 
-  // Build page numbers to display
   const pages: (number | "...")[] = [];
   if (totalPages <= 7) {
     for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -348,27 +431,25 @@ function Pagination({
       aria-label="ניווט בין עמודים"
       className="flex items-center justify-center gap-1.5 mt-10"
     >
-      {/* Previous */}
       {currentPage > 1 ? (
         <Link
           href={buildPageUrl(currentPage - 1)}
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-sm hover:bg-muted transition-colors"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-sm hover:bg-primary/5 hover:border-primary/30 transition-all"
           aria-label="עמוד קודם"
         >
           <ArrowRight className="h-4 w-4" />
         </Link>
       ) : (
-        <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground/40">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/40 text-muted-foreground/30">
           <ArrowRight className="h-4 w-4" />
         </span>
       )}
 
-      {/* Page Numbers */}
       {pages.map((p, i) =>
         p === "..." ? (
           <span
             key={`dots-${i}`}
-            className="flex h-10 w-10 items-center justify-center text-sm text-muted-foreground"
+            className="flex h-10 w-6 items-center justify-center text-sm text-muted-foreground"
           >
             ...
           </span>
@@ -376,10 +457,10 @@ function Pagination({
           <Link
             key={p}
             href={buildPageUrl(p)}
-            className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+            className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-medium transition-all duration-200 ${
               p === currentPage
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "border border-border bg-card hover:bg-muted"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "border border-border bg-card hover:bg-primary/5 hover:border-primary/30"
             }`}
             aria-current={p === currentPage ? "page" : undefined}
           >
@@ -388,17 +469,16 @@ function Pagination({
         )
       )}
 
-      {/* Next */}
       {currentPage < totalPages ? (
         <Link
           href={buildPageUrl(currentPage + 1)}
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-sm hover:bg-muted transition-colors"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-sm hover:bg-primary/5 hover:border-primary/30 transition-all"
           aria-label="עמוד הבא"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
       ) : (
-        <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground/40">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/40 text-muted-foreground/30">
           <ArrowLeft className="h-4 w-4" />
         </span>
       )}
@@ -408,22 +488,26 @@ function Pagination({
 
 function EmptyState({ hasFilters }: { hasFilters: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted mb-5">
-        <Car className="h-10 w-10 text-muted-foreground/50" />
+    <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-up">
+      <div className="relative mb-6">
+        <div className="absolute inset-0 rounded-3xl bg-primary/10 blur-2xl scale-150" />
+        <div className="relative flex h-24 w-24 items-center justify-center rounded-3xl bg-muted/80 border border-border">
+          <SearchX className="h-10 w-10 text-muted-foreground/40" />
+        </div>
       </div>
-      <h2 className="text-lg font-bold mb-2">לא נמצאו רכבים</h2>
-      <p className="text-sm text-muted-foreground max-w-sm mb-6">
+      <h2 className="text-xl font-bold mb-2">לא נמצאו רכבים</h2>
+      <p className="text-sm text-muted-foreground max-w-sm mb-8 leading-relaxed">
         {hasFilters
-          ? "נסו לשנות את הסינון או להרחיב את טווח החיפוש"
+          ? "נסו לשנות את הסינון או להרחיב את טווח החיפוש כדי לראות יותר תוצאות"
           : "כרגע אין רכבים זמינים במערכת. חזרו בקרוב!"}
       </p>
       {hasFilters && (
         <Link
           href="/search"
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
         >
           הצגת כל הרכבים
+          <Search className="h-4 w-4" />
         </Link>
       )}
     </div>
@@ -432,14 +516,19 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
 
 function FilterSidebarSkeleton() {
   return (
-    <aside className="hidden lg:block w-64 shrink-0">
-      <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-        <Skeleton className="h-5 w-20" />
-        <Skeleton className="h-9 w-full" />
-        <Skeleton className="h-5 w-24 mt-4" />
-        <Skeleton className="h-9 w-full" />
-        <Skeleton className="h-5 w-28 mt-4" />
-        <Skeleton className="h-9 w-full" />
+    <aside className="hidden lg:block w-68 shrink-0">
+      <div className="rounded-2xl border border-border bg-card/80 p-5 space-y-5">
+        <div className="flex items-center gap-2.5">
+          <Skeleton className="h-8 w-8 rounded-lg" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+        <Skeleton className="h-10 w-full rounded-xl" />
+        <Skeleton className="h-4 w-20 mt-2" />
+        <Skeleton className="h-10 w-full rounded-xl" />
+        <Skeleton className="h-4 w-16 mt-2" />
+        <Skeleton className="h-2 w-full rounded-full" />
+        <Skeleton className="h-4 w-20 mt-2" />
+        <Skeleton className="h-2 w-full rounded-full" />
       </div>
     </aside>
   );

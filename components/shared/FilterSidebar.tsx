@@ -100,7 +100,7 @@ function SearchableSelect({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-border bg-popover shadow-xl shadow-black/10 overflow-hidden animate-scale-in">
+        <div className="mt-1.5 w-full rounded-xl border border-border bg-popover shadow-xl shadow-black/10 overflow-hidden animate-scale-in">
           <div className="p-2 border-b border-border">
             <div className="relative">
               <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -329,34 +329,35 @@ export function FilterSidebar() {
     label: m,
   }));
 
-  const filterContent = (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between pb-4 mb-1">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-            <SlidersHorizontal className="h-4 w-4 text-primary" />
-          </div>
-          <div>
-            <h2 className="font-bold text-sm">סינון תוצאות</h2>
-            {activeCount > 0 && (
-              <p className="text-[11px] text-primary font-medium">
-                {activeCount} פילטרים פעילים
-              </p>
-            )}
-          </div>
+  const filterHeader = (
+    <div className="flex items-center justify-between pb-4 mb-1">
+      <div className="flex items-center gap-2.5">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+          <SlidersHorizontal className="h-4 w-4 text-primary" />
         </div>
-        {activeCount > 0 && (
-          <button
-            onClick={clearAllFilters}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors rounded-lg px-2 py-1 hover:bg-destructive/5"
-          >
-            <RotateCcw className="h-3 w-3" />
-            נקה
-          </button>
-        )}
+        <div>
+          <h2 className="font-bold text-sm">סינון תוצאות</h2>
+          {activeCount > 0 && (
+            <p className="text-[11px] text-primary font-medium">
+              {activeCount} פילטרים פעילים
+            </p>
+          )}
+        </div>
       </div>
+      {activeCount > 0 && (
+        <button
+          onClick={clearAllFilters}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors rounded-lg px-2 py-1 hover:bg-destructive/5"
+        >
+          <RotateCcw className="h-3 w-3" />
+          נקה
+        </button>
+      )}
+    </div>
+  );
 
+  const filterSections = (
+    <div>
       {/* ─── Make ─── */}
       <FilterSection icon={Sparkles} title="יצרן" defaultOpen>
         <SearchableSelect
@@ -520,21 +521,104 @@ export function FilterSidebar() {
 
   return (
     <>
-      {/* ─── Mobile Toggle ─── */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium hover:border-primary/30 hover:shadow-sm transition-all"
-      >
-        <SlidersHorizontal className="h-4 w-4 text-primary" />
-        סינון
-        {activeCount > 0 && (
-          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground px-1">
-            {activeCount}
-          </span>
-        )}
-      </button>
+      {/* ─── Mobile: Horizontal Scrollable Filters ─── */}
+      <div className="lg:hidden">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
+          {/* "All Filters" button that opens full drawer */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="shrink-0 snap-start inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 text-xs font-medium hover:border-primary/30 transition-all"
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
+            כל הסינונים
+            {activeCount > 0 && (
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground px-0.5">
+                {activeCount}
+              </span>
+            )}
+          </button>
 
-      {/* ─── Mobile Drawer ─── */}
+          {/* Make quick filter */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className={`shrink-0 snap-start inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
+              currentFilters.make
+                ? "border-primary/40 bg-primary/10 text-primary"
+                : "border-border bg-card text-muted-foreground hover:border-primary/30"
+            }`}
+          >
+            <Sparkles className="h-3 w-3" />
+            {currentFilters.make
+              ? makeOptions.find((m) => m.value === currentFilters.make)?.label
+              : "יצרן"}
+            <ChevronDown className="h-3 w-3" />
+          </button>
+
+          {/* Fuel type chips */}
+          {Object.entries(FUEL_TYPES).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() =>
+                updateFilter("fuelType", currentFilters.fuelType === key ? "" : key)
+              }
+              className={`shrink-0 snap-start rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
+                currentFilters.fuelType === key
+                  ? "border-primary/40 bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                  : "border-border bg-card text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+
+          {/* Transmission chips */}
+          {Object.entries(TRANSMISSION_TYPES).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() =>
+                updateFilter("transmission", currentFilters.transmission === key ? "" : key)
+              }
+              className={`shrink-0 snap-start rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
+                currentFilters.transmission === key
+                  ? "border-primary/40 bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                  : "border-border bg-card text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+
+          {/* Region chips */}
+          {Object.entries(REGIONS).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() =>
+                updateFilter("region", currentFilters.region === key ? "" : key)
+              }
+              className={`shrink-0 snap-start rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
+                currentFilters.region === key
+                  ? "border-primary/40 bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                  : "border-border bg-card text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+
+          {/* Clear all */}
+          {activeCount > 0 && (
+            <button
+              onClick={clearAllFilters}
+              className="shrink-0 snap-start inline-flex items-center gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition-all"
+            >
+              <RotateCcw className="h-3 w-3" />
+              נקה
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ─── Mobile Full-Filter Drawer ─── */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
@@ -542,28 +626,30 @@ export function FilterSidebar() {
             onClick={() => setMobileOpen(false)}
           />
           <div className="absolute inset-y-0 start-0 w-80 max-w-[85vw] bg-background shadow-2xl shadow-black/30 overflow-hidden flex flex-col animate-fade-up">
-            {/* Drawer Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-card/50">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                   <SlidersHorizontal className="h-4 w-4 text-primary" />
                 </div>
-                <h2 className="font-bold text-sm">סינון תוצאות</h2>
+                <div>
+                  <h2 className="font-bold text-sm">כל הסינונים</h2>
+                  {activeCount > 0 && (
+                    <p className="text-[11px] text-primary font-medium">
+                      {activeCount} פעילים
+                    </p>
+                  )}
+                </div>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
                 className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted transition-colors"
               >
-                <X className="h-4.5 w-4.5" />
+                <X className="h-5 w-5" />
               </button>
             </div>
-
-            {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto px-5 py-3">
-              {filterContent}
+              {filterSections}
             </div>
-
-            {/* Drawer Footer */}
             <div className="px-5 py-4 border-t border-border bg-card/50">
               <button
                 onClick={() => setMobileOpen(false)}
@@ -578,9 +664,10 @@ export function FilterSidebar() {
       )}
 
       {/* ─── Desktop Sidebar ─── */}
-      <aside className="hidden lg:block w-[272px] shrink-0">
+      <aside className="hidden lg:block w-68 shrink-0">
         <div className="sticky top-24 rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-5 max-h-[calc(100dvh-7rem)] overflow-y-auto shadow-sm">
-          {filterContent}
+          {filterHeader}
+          {filterSections}
         </div>
       </aside>
     </>
