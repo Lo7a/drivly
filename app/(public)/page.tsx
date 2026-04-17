@@ -1,5 +1,5 @@
 import { SearchBar } from "@/components/shared/SearchBar";
-import { HeroParticles } from "@/components/shared/HeroParticles";
+import { CarIllustration } from "@/components/shared/CarIllustration";
 import { CATEGORY_TAGS } from "@/lib/constants";
 import {
   Car,
@@ -32,111 +32,88 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 export default function HomePage() {
   return (
     <>
-      {/* ═══ HERO — Full-bleed immersive ═══ */}
-      <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden">
-        {/* Lighter layered background */}
-        <div className="absolute inset-0 bg-gradient-to-bl from-slate-900 via-slate-800 to-cyan-900" />
-        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(ellipse_at_top_right,_hsl(192_80%_50%_/_0.5),_transparent_55%)]" />
-        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(192_80%_45%_/_0.4),_transparent_55%)]" />
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_60%_40%,_hsl(180_70%_60%_/_0.25),_transparent_40%)]" />
+      {/* ═══ HERO — Split layout with car illustration ═══ */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800/95 to-background">
+        {/* Ambient glow */}
+        <div className="absolute top-0 end-0 w-[600px] h-[600px] bg-[radial-gradient(circle,_hsl(192_80%_50%_/_0.15),_transparent_65%)]" />
+        <div className="absolute bottom-0 start-0 w-[400px] h-[400px] bg-[radial-gradient(circle,_hsl(192_80%_45%_/_0.1),_transparent_65%)]" />
 
-        {/* Grid pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: `linear-gradient(hsl(0 0% 100% / 0.15) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(0 0% 100% / 0.15) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
-          }}
-        />
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-4 items-center min-h-[85vh] py-16 lg:py-0">
 
-        {/* Floating decorative shapes */}
-        <div className="absolute top-[15%] end-[10%] h-64 w-64 rounded-full border border-white/[0.06] animate-float" />
-        <div className="absolute top-[40%] end-[25%] h-40 w-40 rounded-full border border-cyan-400/[0.08]" style={{ animationDelay: "1.5s" }} />
-        <div className="absolute bottom-[20%] start-[8%] h-52 w-52 rounded-full bg-cyan-400/[0.04] blur-xl" />
-        <div className="absolute top-[10%] start-[15%] h-32 w-32 rounded-full bg-teal-400/[0.06] blur-2xl" />
+            {/* Left: Content */}
+            <div className="order-2 lg:order-1">
+              {/* Eyebrow */}
+              <div className="animate-fade-up inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm text-cyan-300 mb-6">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                סוחרים מאומתים · עדכון יומי
+              </div>
 
-        {/* Diagonal light streak */}
-        <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(135deg,_transparent_40%,_hsl(192_80%_70%_/_0.3)_50%,_transparent_60%)]" />
+              <h1 className="animate-fade-up delay-150 text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mb-5">
+                הרכב הבא שלכם
+                <br />
+                <span className="bg-gradient-to-l from-cyan-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                  מתחיל כאן.
+                </span>
+              </h1>
 
-        {/* Interactive particles */}
-        <HeroParticles />
+              <p className="animate-fade-up delay-300 text-base sm:text-lg text-slate-300 max-w-lg mb-8 leading-relaxed">
+                גלו את העלות החודשית
+                <span className="text-white font-semibold"> האמיתית </span>
+                של כל רכב — כולל מימון, ביטוח ודלק.
+              </p>
 
-        <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-3xl">
-            {/* Eyebrow */}
-            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm text-cyan-300 mb-8">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              סוחרים מאומתים · עדכון יומי
-            </div>
+              {/* Search */}
+              <div className="animate-fade-up delay-400 max-w-lg">
+                <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-2 shadow-2xl shadow-cyan-900/20">
+                  <SearchBar size="lg" placeholder="חפשו יצרן, דגם או מחיר..." />
+                </div>
+              </div>
 
-            {/* Headline — editorial style */}
-            <h1 className="animate-fade-up delay-150 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
-              הרכב הבא שלכם
-              <br />
-              <span className="bg-gradient-to-l from-cyan-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                מתחיל כאן.
-              </span>
-            </h1>
-
-            <p className="animate-fade-up delay-300 text-base sm:text-lg text-slate-300 max-w-xl mb-10 leading-relaxed">
-              גלו את העלות החודשית
-              <span className="text-white font-semibold"> האמיתית </span>
-              של כל רכב — כולל מימון, ביטוח ודלק. לא הפתעות, לא אותיות קטנות.
-            </p>
-
-            {/* Search — prominent, glassmorphic */}
-            <div className="animate-fade-up delay-400 max-w-xl">
-              <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-2 shadow-2xl shadow-cyan-900/20">
-                <SearchBar size="lg" placeholder="חפשו יצרן, דגם או מחיר..." />
+              {/* Trust badges */}
+              <div className="animate-fade-up delay-500 flex flex-wrap items-center gap-x-6 gap-y-2 mt-6 text-sm text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                  ללא עמלות
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                  סוחרים מאומתים
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                  מחשבון חכם
+                </span>
               </div>
             </div>
 
-            {/* Trust indicators */}
-            <div className="animate-fade-up delay-500 flex flex-wrap items-center gap-x-6 gap-y-2 mt-8 text-sm text-slate-400">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                ללא עמלות
-              </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                סוחרים מאומתים
-              </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                מחשבון מימון חכם
-              </span>
-            </div>
-          </div>
+            {/* Right: Car Illustration + Stats */}
+            <div className="order-1 lg:order-2 relative">
+              <div className="animate-fade-up delay-200 relative">
+                {/* Glow behind car */}
+                <div className="absolute inset-0 scale-125 bg-[radial-gradient(ellipse_at_center,_hsl(192_80%_50%_/_0.12),_transparent_60%)]" />
 
-          {/* Stats — floating on the right side (desktop) */}
-          <div className="hidden lg:flex absolute end-8 top-1/2 -translate-y-1/2 flex-col gap-4 w-56">
-            {[
-              { num: "1,200+", label: "רכבים במערכת", icon: Car },
-              { num: "98%", label: "שביעות רצון", icon: Star },
-              { num: "24 שעות", label: "זמן תגובה", icon: Clock },
-            ].map(({ num, label, icon: Icon }, i) => (
-              <div
-                key={i}
-                className="animate-fade-up rounded-xl bg-white/5 backdrop-blur border border-white/10 p-4 hover:bg-white/10 transition-colors"
-                style={{ animationDelay: `${500 + i * 100}ms` }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/20">
-                    <Icon className="h-5 w-5 text-cyan-400" />
+                {/* Car SVG */}
+                <CarIllustration className="w-full max-w-[600px] mx-auto drop-shadow-2xl" />
+
+                {/* Floating stat cards on top of car */}
+                <div className="hidden sm:block absolute top-4 end-4 animate-fade-up delay-500">
+                  <div className="rounded-xl bg-white/10 backdrop-blur-lg border border-white/15 px-4 py-3 shadow-xl">
+                    <p className="text-2xl font-bold text-white">1,200+</p>
+                    <p className="text-xs text-slate-400">רכבים במערכת</p>
                   </div>
-                  <div>
-                    <p className="text-lg font-bold text-white">{num}</p>
-                    <p className="text-xs text-slate-400">{label}</p>
+                </div>
+
+                <div className="hidden sm:block absolute bottom-12 start-4 animate-fade-up delay-600">
+                  <div className="rounded-xl bg-white/10 backdrop-blur-lg border border-white/15 px-4 py-3 shadow-xl">
+                    <p className="text-xs text-slate-400 mb-0.5">עלות חודשית מ-</p>
+                    <p className="text-xl font-bold text-cyan-400">1,500₪</p>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
-
-        {/* Bottom fade to white */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
       </section>
 
       {/* ═══ CATEGORIES — Horizontal scroll on mobile, grid on desktop ═══ */}
