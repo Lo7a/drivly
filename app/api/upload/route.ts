@@ -18,9 +18,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "סוג קובץ לא נתמך. השתמש ב-JPEG, PNG או WebP" }, { status: 400 });
     }
 
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: "הקובץ גדול מדי. מקסימום 5MB" }, { status: 400 });
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: "הקובץ גדול מדי. מקסימום 10MB" }, { status: 400 });
     }
 
     const supabase = await createAdminClient();

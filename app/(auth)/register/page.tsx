@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { User, Phone, Mail, Lock, Building2, MapPin, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 import { REGIONS } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
+import { translateError } from "@/lib/errors";
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
@@ -43,14 +45,19 @@ export default function RegisterPage() {
       });
 
       if (error) {
-        setError(error.message);
+        const msg = translateError(error.message);
+        setError(msg);
+        toast.error(msg);
         return;
       }
 
       // TODO: Create User + Dealer records via API
+      toast.success("נרשמת בהצלחה!");
       setSuccess(true);
     } catch {
-      setError("שגיאה בהרשמה. נסה שנית.");
+      const msg = translateError("Failed to fetch");
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -65,7 +72,9 @@ export default function RegisterPage() {
       },
     });
     if (error) {
-      setError("שגיאה בהתחברות עם Google");
+      const msg = translateError(error.message);
+      setError(msg);
+      toast.error(msg);
       setGoogleLoading(false);
     }
   };

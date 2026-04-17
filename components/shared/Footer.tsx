@@ -6,12 +6,12 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-muted/30">
+    <footer className="border-t border-border bg-card/50">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4">
-            <Logo size="sm" />
+            <Logo size="sm" variant="auto" />
             <p className="text-sm text-muted-foreground leading-relaxed">
               מצאו את הרכב המושלם עבורכם.
               <br />
@@ -21,12 +21,12 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-sm font-semibold mb-4">ניווט מהיר</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">ניווט מהיר</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   דף הבית
                 </Link>
@@ -34,7 +34,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/search"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   חיפוש רכבים
                 </Link>
@@ -44,12 +44,12 @@ export function Footer() {
 
           {/* For Dealers */}
           <div>
-            <h3 className="text-sm font-semibold mb-4">לסוחרים</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">לסוחרים</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/login"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   כניסה למערכת
                 </Link>
@@ -57,7 +57,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/register"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   הרשמה כסוחר
                 </Link>
@@ -67,7 +67,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-sm font-semibold mb-4">יצירת קשר</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">יצירת קשר</h3>
             <ul className="space-y-2">
               <li className="text-sm text-muted-foreground">
                 טלפון: 050-0000000

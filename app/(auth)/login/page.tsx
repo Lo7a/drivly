@@ -69,7 +69,9 @@ function LoginForm() {
       },
     });
     if (error) {
-      setError("שגיאה בהתחברות עם Google");
+      const msg = translateError(error.message);
+      setError(msg);
+      toast.error(msg);
       setGoogleLoading(false);
     }
   };
@@ -136,6 +138,7 @@ function LoginForm() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
