@@ -1,6 +1,5 @@
-ignoredBuiltDependencies:
+onlyBuiltDependencies:
   - '@prisma/engines'
-  - esbuild
   - prisma
+  - esbuild
   - sharp
-  - unrs-resolver
