@@ -20,19 +20,19 @@ export default function NewCarPage() {
   };
 
   const inputClass =
-    "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 outline-none transition focus:border-cyan-400";
+    "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-cyan-400";
   const selectClass =
-    "w-full rounded-xl border border-white/10 bg-[#151d30] px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400 appearance-none";
-  const labelClass = "text-xs font-medium text-white/50 mb-1.5 block";
+    "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground outline-none transition focus:border-cyan-400 appearance-none";
+  const labelClass = "text-xs font-medium text-muted-foreground mb-1.5 block";
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">הוספת רכב חדש</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">הוספת רכב חדש</h1>
 
       <form onSubmit={handleSubmit} className="max-w-3xl space-y-6">
         {/* Basic info */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-white mb-4">פרטי הרכב</h2>
+        <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+          <h2 className="text-lg font-bold text-foreground mb-4">פרטי הרכב</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>יצרן *</label>
@@ -75,8 +75,8 @@ export default function NewCarPage() {
         </div>
 
         {/* Specs */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-white mb-4">מפרט טכני</h2>
+        <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+          <h2 className="text-lg font-bold text-foreground mb-4">מפרט טכני</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>סוג דלק *</label>
@@ -119,8 +119,8 @@ export default function NewCarPage() {
         </div>
 
         {/* Description */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-white mb-4">תיאור</h2>
+        <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+          <h2 className="text-lg font-bold text-foreground mb-4">תיאור</h2>
           <textarea
             rows={4}
             placeholder="תארו את הרכב — מצב, היסטוריה, אבזור מיוחד..."
@@ -129,16 +129,16 @@ export default function NewCarPage() {
         </div>
 
         {/* Features */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-white mb-4">אפשרויות נוספות</h2>
+        <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+          <h2 className="text-lg font-bold text-foreground mb-4">אפשרויות נוספות</h2>
           <div className="flex flex-wrap gap-4">
             {[
               { id: "financing", label: "מימון זמין" },
               { id: "tradeIn", label: "טרייד אין" },
               { id: "warranty", label: "אחריות" },
             ].map(({ id, label }) => (
-              <label key={id} className="flex items-center gap-2 text-sm text-white/70">
-                <input type="checkbox" className="h-4 w-4 rounded border-white/20" />
+              <label key={id} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <input type="checkbox" className="h-4 w-4 rounded border-border" />
                 {label}
               </label>
             ))}
@@ -157,7 +157,7 @@ export default function NewCarPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-6 py-3.5 text-sm font-medium text-white/70 transition hover:bg-white/10"
+            className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-medium text-muted-foreground transition hover:bg-muted"
           >
             ביטול
           </button>

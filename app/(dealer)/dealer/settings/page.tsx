@@ -15,16 +15,16 @@ export default function DealerSettingsPage() {
   };
 
   const inputClass =
-    "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 outline-none transition focus:border-cyan-400";
-  const labelClass = "text-xs font-medium text-white/50 mb-1.5 block";
+    "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-cyan-400";
+  const labelClass = "text-xs font-medium text-muted-foreground mb-1.5 block";
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">הגדרות</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">הגדרות</h1>
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-          <h2 className="text-lg font-bold text-white mb-4">פרטי העסק</h2>
+        <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+          <h2 className="text-lg font-bold text-foreground mb-4">פרטי העסק</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>שם העסק</label>
@@ -40,7 +40,7 @@ export default function DealerSettingsPage() {
             </div>
             <div>
               <label className={labelClass}>אזור</label>
-              <select defaultValue="CENTER" className="w-full rounded-xl border border-white/10 bg-[#151d30] px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400 appearance-none">
+              <select defaultValue="CENTER" className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground outline-none transition focus:border-cyan-400 appearance-none">
                 {Object.entries(REGIONS).map(([key, label]) => (
                   <option key={key} value={key}>{label}</option>
                 ))}
@@ -60,7 +60,7 @@ export default function DealerSettingsPage() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-cyan-400 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-bold text-foreground transition hover:bg-cyan-400 disabled:opacity-50"
         >
           {loading ? "שומר..." : "שמור שינויים"}
           <Save className="h-4 w-4" />

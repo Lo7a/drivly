@@ -26,18 +26,18 @@ const TYPE_COLORS: Record<string, string> = {
 export default function AdminDashboardPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">דשבורד אדמין</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">דשבורד אדמין</h1>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {STATS.map(({ label, value, icon: Icon, color, change }) => (
-          <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <div key={label} className="rounded-2xl border border-border bg-card p-4">
             <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${color} mb-2`}>
               <Icon className="h-4 w-4" />
             </div>
-            <p className="text-xl font-bold text-white">{value}</p>
+            <p className="text-xl font-bold text-foreground">{value}</p>
             <div className="flex items-center justify-between mt-1">
-              <p className="text-[11px] text-white/50">{label}</p>
+              <p className="text-[11px] text-muted-foreground">{label}</p>
               {change && <span className="text-[10px] text-emerald-400">{change}</span>}
             </div>
           </div>
@@ -45,9 +45,9 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Recent Leads — THE key screen */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+      <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-white">לידים אחרונים</h2>
+          <h2 className="text-lg font-bold text-foreground">לידים אחרונים</h2>
           <a href="/admin/leads" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">
             הצג הכל →
           </a>
@@ -57,7 +57,7 @@ export default function AdminDashboardPage() {
         <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/[0.06] text-white/40">
+              <tr className="border-b border-border text-muted-foreground">
                 <th className="text-start py-3 font-medium">שם</th>
                 <th className="text-start py-3 font-medium">טלפון</th>
                 <th className="text-start py-3 font-medium">סוג</th>
@@ -67,16 +67,16 @@ export default function AdminDashboardPage() {
             </thead>
             <tbody>
               {RECENT_LEADS.map((lead) => (
-                <tr key={lead.phone} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                  <td className="py-3 text-white font-medium">{lead.name}</td>
-                  <td className="py-3 text-white/70 dir-ltr">{lead.phone}</td>
+                <tr key={lead.phone} className="border-b border-border hover:bg-accent transition-colors">
+                  <td className="py-3 text-foreground font-medium">{lead.name}</td>
+                  <td className="py-3 text-muted-foreground dir-ltr">{lead.phone}</td>
                   <td className="py-3">
                     <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${TYPE_COLORS[lead.type]}`}>
                       {lead.type}
                     </span>
                   </td>
-                  <td className="py-3 text-white/70">{lead.car}</td>
-                  <td className="py-3 text-white/40 text-xs">{lead.time}</td>
+                  <td className="py-3 text-muted-foreground">{lead.car}</td>
+                  <td className="py-3 text-muted-foreground text-xs">{lead.time}</td>
                 </tr>
               ))}
             </tbody>
@@ -86,17 +86,17 @@ export default function AdminDashboardPage() {
         {/* Cards — mobile */}
         <div className="sm:hidden space-y-3">
           {RECENT_LEADS.map((lead) => (
-            <div key={lead.phone} className="rounded-xl border border-white/[0.06] p-3">
+            <div key={lead.phone} className="rounded-xl border border-border p-3">
               <div className="flex items-center justify-between mb-1">
-                <p className="font-medium text-white text-sm">{lead.name}</p>
+                <p className="font-medium text-foreground text-sm">{lead.name}</p>
                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${TYPE_COLORS[lead.type]}`}>
                   {lead.type}
                 </span>
               </div>
-              <p className="text-xs text-white/50">{lead.car}</p>
+              <p className="text-xs text-muted-foreground">{lead.car}</p>
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-white/70">{lead.phone}</p>
-                <p className="text-[10px] text-white/30">{lead.time}</p>
+                <p className="text-xs text-muted-foreground">{lead.phone}</p>
+                <p className="text-[10px] text-muted-foreground">{lead.time}</p>
               </div>
             </div>
           ))}

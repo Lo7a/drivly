@@ -19,15 +19,15 @@ const TYPE_COLORS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   NEW: "bg-cyan-500/10 text-cyan-400",
   IN_PROGRESS: "bg-amber-500/10 text-amber-400",
-  CLOSED: "bg-white/10 text-white/50",
+  CLOSED: "bg-muted text-muted-foreground",
 };
 
 export default function AdminLeadsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">ניהול לידים</h1>
-        <button className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70 hover:bg-white/10 transition-colors">
+        <h1 className="text-2xl font-bold text-foreground">ניהול לידים</h1>
+        <button className="inline-flex items-center gap-2 rounded-xl border border-border bg-white/5 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors">
           <Filter className="h-4 w-4" />
           סינון
         </button>
@@ -37,15 +37,15 @@ export default function AdminLeadsPage() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 text-center">
           <p className="text-2xl font-bold text-cyan-400">{MOCK_LEADS.filter((l) => l.status === "NEW").length}</p>
-          <p className="text-xs text-white/50 mt-1">חדשים</p>
+          <p className="text-xs text-muted-foreground mt-1">חדשים</p>
         </div>
         <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-center">
           <p className="text-2xl font-bold text-amber-400">{MOCK_LEADS.filter((l) => l.status === "IN_PROGRESS").length}</p>
-          <p className="text-xs text-white/50 mt-1">בטיפול</p>
+          <p className="text-xs text-muted-foreground mt-1">בטיפול</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center">
-          <p className="text-2xl font-bold text-white/50">{MOCK_LEADS.filter((l) => l.status === "CLOSED").length}</p>
-          <p className="text-xs text-white/50 mt-1">סגורים</p>
+        <div className="rounded-xl border border-border bg-card p-4 text-center">
+          <p className="text-2xl font-bold text-foreground/50">{MOCK_LEADS.filter((l) => l.status === "CLOSED").length}</p>
+          <p className="text-xs text-muted-foreground mt-1">סגורים</p>
         </div>
       </div>
 
@@ -54,13 +54,13 @@ export default function AdminLeadsPage() {
         {MOCK_LEADS.map((lead) => (
           <div
             key={lead.id}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 hover:bg-white/[0.05] transition-colors"
+            className="rounded-2xl border border-border bg-card p-4 sm:p-5 hover:bg-accent transition-colors"
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               {/* Name + contact */}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="font-bold text-white">{lead.fullName}</p>
+                  <p className="font-bold text-foreground">{lead.fullName}</p>
                   <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${TYPE_COLORS[lead.type]}`}>
                     {LEAD_TYPE_LABELS[lead.type]}
                   </span>
@@ -68,9 +68,9 @@ export default function AdminLeadsPage() {
                     {LEAD_STATUS_LABELS[lead.status]}
                   </span>
                 </div>
-                <p className="text-sm text-white/50">{lead.car} · {lead.dealer}</p>
+                <p className="text-sm text-muted-foreground">{lead.car} · {lead.dealer}</p>
                 {lead.message && (
-                  <p className="text-xs text-white/40 mt-1 flex items-center gap-1">
+                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                     <MessageSquare className="h-3 w-3" />
                     {lead.message}
                   </p>
@@ -89,12 +89,12 @@ export default function AdminLeadsPage() {
                 {lead.email && (
                   <a
                     href={`mailto:${lead.email}`}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-white/50 hover:bg-white/10 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-border px-3 py-2 text-xs text-muted-foreground hover:bg-muted transition-colors"
                   >
                     <Mail className="h-3.5 w-3.5" />
                   </a>
                 )}
-                <span className="text-[10px] text-white/30">{lead.createdAt}</span>
+                <span className="text-[10px] text-muted-foreground">{lead.createdAt}</span>
               </div>
             </div>
           </div>

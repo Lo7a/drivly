@@ -12,7 +12,7 @@ const MOCK_ADMIN_CARS = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-white/10 text-white/60",
+  DRAFT: "bg-muted text-muted-foreground",
   PENDING_APPROVAL: "bg-amber-500/10 text-amber-400",
   APPROVED: "bg-emerald-500/10 text-emerald-400",
   REJECTED: "bg-red-500/10 text-red-400",
@@ -22,7 +22,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function AdminCarsPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">ניהול רכבים</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">ניהול רכבים</h1>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
@@ -30,11 +30,11 @@ export default function AdminCarsPage() {
           { label: "מאושרים", count: MOCK_ADMIN_CARS.filter((c) => c.status === "APPROVED").length, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-400" },
           { label: "ממתינים", count: MOCK_ADMIN_CARS.filter((c) => c.status === "PENDING_APPROVAL").length, color: "border-amber-500/20 bg-amber-500/5 text-amber-400" },
           { label: "נדחו", count: MOCK_ADMIN_CARS.filter((c) => c.status === "REJECTED").length, color: "border-red-500/20 bg-red-500/5 text-red-400" },
-          { label: "סה״כ", count: MOCK_ADMIN_CARS.length, color: "border-white/10 bg-white/[0.03] text-white" },
+          { label: "סה״כ", count: MOCK_ADMIN_CARS.length, color: "border-border bg-card text-white" },
         ].map(({ label, count, color }) => (
           <div key={label} className={`rounded-xl border p-4 text-center ${color}`}>
             <p className="text-2xl font-bold">{count}</p>
-            <p className="text-xs text-white/50 mt-1">{label}</p>
+            <p className="text-xs text-muted-foreground mt-1">{label}</p>
           </div>
         ))}
       </div>
@@ -44,23 +44,23 @@ export default function AdminCarsPage() {
         {MOCK_ADMIN_CARS.map((car) => (
           <div
             key={car.id}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 hover:bg-white/[0.05] transition-colors"
+            className="rounded-2xl border border-border bg-card p-4 sm:p-5 hover:bg-accent transition-colors"
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="font-bold text-white">{car.make} {car.model} {car.year}</p>
+                  <p className="font-bold text-foreground">{car.make} {car.model} {car.year}</p>
                   <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${STATUS_COLORS[car.status]}`}>
                     {CAR_STATUS_LABELS[car.status]}
                   </span>
                 </div>
-                <p className="text-sm text-white/50">
+                <p className="text-sm text-muted-foreground">
                   {formatPrice(car.price)} · {formatKm(car.km)} · {car.dealer}
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 text-xs text-white/40">
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Eye className="h-3.5 w-3.5" />
                   {car.views}
                 </span>

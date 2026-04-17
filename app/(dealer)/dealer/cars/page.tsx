@@ -11,7 +11,7 @@ const MOCK_DEALER_CARS = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-white/10 text-white/60",
+  DRAFT: "bg-muted text-muted-foreground",
   PENDING_APPROVAL: "bg-amber-500/10 text-amber-400",
   APPROVED: "bg-emerald-500/10 text-emerald-400",
   REJECTED: "bg-red-500/10 text-red-400",
@@ -22,7 +22,7 @@ export default function DealerCarsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">הרכבים שלי</h1>
+        <h1 className="text-2xl font-bold text-foreground">הרכבים שלי</h1>
         <Link
           href="/dealer/cars/new"
           className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-400"
@@ -37,19 +37,19 @@ export default function DealerCarsPage() {
         {MOCK_DEALER_CARS.map((car) => (
           <div
             key={car.id}
-            className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:bg-white/[0.05] transition-colors"
+            className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 hover:bg-accent transition-colors"
           >
             {/* Car icon placeholder */}
-            <div className="hidden sm:flex h-16 w-24 shrink-0 items-center justify-center rounded-xl bg-white/5">
+            <div className="hidden sm:flex h-16 w-24 shrink-0 items-center justify-center rounded-xl bg-card">
               <span className="text-2xl">🚗</span>
             </div>
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-white text-sm">
+              <p className="font-semibold text-foreground text-sm">
                 {car.make} {car.model} {car.year}
               </p>
-              <p className="text-xs text-white/40 mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {formatPrice(car.price)} · {formatKm(car.km)}
               </p>
             </div>
@@ -60,7 +60,7 @@ export default function DealerCarsPage() {
             </span>
 
             {/* Views */}
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-white/40">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
               <Eye className="h-3.5 w-3.5" />
               {car.views}
             </div>
@@ -68,7 +68,7 @@ export default function DealerCarsPage() {
             {/* Actions */}
             <Link
               href={`/dealer/cars/${car.id}/edit`}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               <MoreHorizontal className="h-4 w-4" />
             </Link>
