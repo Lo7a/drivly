@@ -33,20 +33,30 @@ export default function HomePage() {
     <>
       {/* ═══ HERO — Full-bleed immersive ═══ */}
       <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden">
-        {/* Layered background */}
-        <div className="absolute inset-0 bg-gradient-to-bl from-slate-950 via-slate-900 to-cyan-950" />
-        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top_right,_hsl(192_80%_40%_/_0.4),_transparent_60%)]" />
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(192_80%_40%_/_0.3),_transparent_60%)]" />
+        {/* Lighter layered background */}
+        <div className="absolute inset-0 bg-gradient-to-bl from-slate-900 via-slate-800 to-cyan-900" />
+        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(ellipse_at_top_right,_hsl(192_80%_50%_/_0.5),_transparent_55%)]" />
+        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(192_80%_45%_/_0.4),_transparent_55%)]" />
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_60%_40%,_hsl(180_70%_60%_/_0.25),_transparent_40%)]" />
 
         {/* Grid pattern overlay */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
-            backgroundImage: `linear-gradient(hsl(0 0% 100% / 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(0 0% 100% / 0.1) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(hsl(0 0% 100% / 0.15) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(0 0% 100% / 0.15) 1px, transparent 1px)`,
             backgroundSize: "60px 60px",
           }}
         />
+
+        {/* Floating decorative shapes */}
+        <div className="absolute top-[15%] end-[10%] h-64 w-64 rounded-full border border-white/[0.06] animate-float" />
+        <div className="absolute top-[40%] end-[25%] h-40 w-40 rounded-full border border-cyan-400/[0.08]" style={{ animationDelay: "1.5s" }} />
+        <div className="absolute bottom-[20%] start-[8%] h-52 w-52 rounded-full bg-cyan-400/[0.04] blur-xl" />
+        <div className="absolute top-[10%] start-[15%] h-32 w-32 rounded-full bg-teal-400/[0.06] blur-2xl" />
+
+        {/* Diagonal light streak */}
+        <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(135deg,_transparent_40%,_hsl(192_80%_70%_/_0.3)_50%,_transparent_60%)]" />
 
         <div className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-20">
           <div className="max-w-3xl">
