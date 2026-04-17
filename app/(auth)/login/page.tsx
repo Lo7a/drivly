@@ -4,7 +4,9 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { translateError } from "@/lib/errors";
 
 export default function LoginPage() {
   return (
@@ -40,14 +42,19 @@ function LoginForm() {
       });
 
       if (error) {
-        setError("אימייל או סיסמה שגויים");
+        const msg = translateError(error.message);
+        setError(msg);
+        toast.error(msg);
         return;
       }
 
+      toast.success("התחברת בהצלחה!");
       router.push(redirect);
       router.refresh();
     } catch {
-      setError("שגיאה בהתחברות. נסה שנית.");
+      const msg = translateError("Failed to fetch");
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
