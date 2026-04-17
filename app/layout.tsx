@@ -55,9 +55,7 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl" className={rubik.variable} suppressHydrationWarning>
       <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="min-h-dvh bg-background text-foreground antialiased">
         <ThemeProvider>
