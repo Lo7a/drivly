@@ -40,9 +40,13 @@ export default function HomePage() {
       <SearchFilters />
 
       {/* ═══ "WHY DRIVLY?" ═══ */}
-      <section className="py-16 sm:py-24 mt-8">
+      <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
+            <span className="text-4xl sm:text-5xl font-bold tracking-tight mb-2 block">
+              <span className="text-foreground">Driv</span>
+              <span className="text-primary">ly</span>
+            </span>
             <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-3">
               למה Drivly?
             </p>

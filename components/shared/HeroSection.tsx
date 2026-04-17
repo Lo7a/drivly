@@ -37,7 +37,7 @@ export function HeroSection() {
           fill
           priority
           unoptimized
-          className="object-cover object-center"
+          className="object-cover object-left sm:object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-l from-[#050816]/90 via-[#050816]/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-transparent to-[#050816]/70" />
