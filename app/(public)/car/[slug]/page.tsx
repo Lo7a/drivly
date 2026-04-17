@@ -80,7 +80,7 @@ export default async function CarDetailPage({ params }: PageProps) {
       />
 
       {/* Breadcrumb */}
-      <div className="bg-muted/30 border-b border-border">
+      <div className="bg-muted/30 border-b border-border pt-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground transition-colors">ראשי</Link>

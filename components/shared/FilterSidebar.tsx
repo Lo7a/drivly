@@ -1,23 +1,23 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   SlidersHorizontal,
   X,
   RotateCcw,
   ChevronLeft,
+  ChevronDown,
+  Search,
+  Fuel,
+  Gauge,
+  Calendar,
+  MapPin,
+  Hand,
+  Tag,
+  Settings2,
+  Sparkles,
 } from "lucide-react";
 import {
   CAR_MAKES,
@@ -38,32 +38,227 @@ const KM_MIN = 0;
 const KM_MAX = 300000;
 const KM_STEP = 5000;
 
+// ─── Searchable Combobox ────────────────────────────────
+
+function SearchableSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  emptyText = "לא נמצאו תוצאות",
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  options: { value: string; label: string }[];
+  placeholder: string;
+  emptyText?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const filtered = useMemo(() => {
+    if (!query) return options;
+    const q = query.toLowerCase();
+    return options.filter((o) => o.label.toLowerCase().includes(q));
+  }, [options, query]);
+
+  const selectedLabel = options.find((o) => o.value === value)?.label || "";
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery("");
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(!open);
+          if (!open) setTimeout(() => inputRef.current?.focus(), 50);
+        }}
+        className={`w-full flex items-center justify-between rounded-xl border px-3 py-2.5 text-sm transition-all ${
+          open
+            ? "border-primary/50 bg-primary/5 ring-2 ring-primary/20"
+            : "border-border bg-background hover:border-primary/30"
+        } ${value ? "text-foreground" : "text-muted-foreground"}`}
+      >
+        <span className="truncate">{selectedLabel || placeholder}</span>
+        <ChevronDown
+          className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-border bg-popover shadow-xl shadow-black/10 overflow-hidden animate-scale-in">
+          <div className="p-2 border-b border-border">
+            <div className="relative">
+              <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="חיפוש..."
+                className="w-full rounded-lg bg-muted/50 ps-8 pe-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60 focus:bg-muted"
+              />
+            </div>
+          </div>
+          <div className="max-h-48 overflow-y-auto py-1">
+            {/* Clear option */}
+            {value && (
+              <button
+                type="button"
+                onClick={() => {
+                  onChange("");
+                  setOpen(false);
+                  setQuery("");
+                }}
+                className="w-full text-start px-3 py-2 text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
+              >
+                {placeholder}
+              </button>
+            )}
+            {filtered.length > 0 ? (
+              filtered.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                    setQuery("");
+                  }}
+                  className={`w-full text-start px-3 py-2 text-sm transition-colors ${
+                    opt.value === value
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "hover:bg-muted/50 text-foreground"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))
+            ) : (
+              <p className="px-3 py-4 text-center text-xs text-muted-foreground">
+                {emptyText}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Filter Section ─────────────────────────────────────
+
+function FilterSection({
+  icon: Icon,
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border-b border-border/60 last:border-b-0">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-2.5 py-3.5 text-sm font-semibold hover:text-primary transition-colors group"
+      >
+        <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+        <span className="flex-1 text-start">{title}</span>
+        <ChevronDown
+          className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      <div
+        className={`grid transition-all duration-200 ease-out ${
+          open ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Chip Select ────────────────────────────────────────
+
+function ChipSelect({
+  options,
+  value,
+  onChange,
+}: {
+  options: { key: string; label: string }[];
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {options.map((opt) => (
+        <button
+          key={opt.key}
+          type="button"
+          onClick={() => onChange(value === opt.key ? "" : opt.key)}
+          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+            value === opt.key
+              ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+              : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Main Component ─────────────────────────────────────
+
 export function FilterSidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  // Mobile open state
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Read current filters from URL
-  const currentFilters = useMemo(() => ({
-    make: searchParams.get("make") || "",
-    model: searchParams.get("model") || "",
-    minPrice: Number(searchParams.get("minPrice")) || PRICE_MIN,
-    maxPrice: Number(searchParams.get("maxPrice")) || PRICE_MAX,
-    minYear: Number(searchParams.get("minYear")) || MIN_YEAR,
-    maxYear: Number(searchParams.get("maxYear")) || MAX_YEAR,
-    minKm: Number(searchParams.get("minKm")) || KM_MIN,
-    maxKm: Number(searchParams.get("maxKm")) || KM_MAX,
-    fuelType: searchParams.get("fuelType") || "",
-    transmission: searchParams.get("transmission") || "",
-    region: searchParams.get("region") || "",
-    hand: searchParams.get("hand") || "",
-    category: searchParams.get("category") || "",
-  }), [searchParams]);
+  const currentFilters = useMemo(
+    () => ({
+      make: searchParams.get("make") || "",
+      model: searchParams.get("model") || "",
+      minPrice: Number(searchParams.get("minPrice")) || PRICE_MIN,
+      maxPrice: Number(searchParams.get("maxPrice")) || PRICE_MAX,
+      minYear: Number(searchParams.get("minYear")) || MIN_YEAR,
+      maxYear: Number(searchParams.get("maxYear")) || MAX_YEAR,
+      minKm: Number(searchParams.get("minKm")) || KM_MIN,
+      maxKm: Number(searchParams.get("maxKm")) || KM_MAX,
+      fuelType: searchParams.get("fuelType") || "",
+      transmission: searchParams.get("transmission") || "",
+      region: searchParams.get("region") || "",
+      hand: searchParams.get("hand") || "",
+      category: searchParams.get("category") || "",
+    }),
+    [searchParams]
+  );
 
-  // Count active filters
   const activeCount = useMemo(() => {
     let count = 0;
     if (currentFilters.make) count++;
@@ -82,7 +277,6 @@ export function FilterSidebar() {
     return count;
   }, [currentFilters]);
 
-  // Update URL params
   const updateFilter = useCallback(
     (key: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -91,7 +285,6 @@ export function FilterSidebar() {
       } else {
         params.delete(key);
       }
-      // Reset to page 1 when filters change
       params.delete("page");
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
     },
@@ -101,16 +294,10 @@ export function FilterSidebar() {
   const updateRangeFilter = useCallback(
     (minKey: string, maxKey: string, values: number[], min: number, max: number) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (values[0] > min) {
-        params.set(minKey, String(values[0]));
-      } else {
-        params.delete(minKey);
-      }
-      if (values[1] < max) {
-        params.set(maxKey, String(values[1]));
-      } else {
-        params.delete(maxKey);
-      }
+      if (values[0] > min) params.set(minKey, String(values[0]));
+      else params.delete(minKey);
+      if (values[1] < max) params.set(maxKey, String(values[1]));
+      else params.delete(maxKey);
       params.delete("page");
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
     },
@@ -126,336 +313,273 @@ export function FilterSidebar() {
     router.push(`${pathname}?${params.toString()}`);
   }, [router, pathname, searchParams]);
 
-  // Get models for selected make
   const availableModels = useMemo(() => {
     if (!currentFilters.make) return [];
     const found = CAR_MAKES.find((m) => m.value === currentFilters.make);
     return found?.models || [];
   }, [currentFilters.make]);
 
+  const makeOptions = CAR_MAKES.filter((m) => m.value !== "other").map((m) => ({
+    value: m.value,
+    label: m.label,
+  }));
+
+  const modelOptions = availableModels.map((m) => ({
+    value: m,
+    label: m,
+  }));
+
   const filterContent = (
-    <div className="space-y-1">
+    <div>
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-border">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-primary" />
-          <h2 className="font-bold text-sm">סינון</h2>
-          {activeCount > 0 && (
-            <Badge variant="secondary" className="text-xs px-1.5 py-0">
-              {activeCount}
-            </Badge>
-          )}
+      <div className="flex items-center justify-between pb-4 mb-1">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+            <SlidersHorizontal className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-bold text-sm">סינון תוצאות</h2>
+            {activeCount > 0 && (
+              <p className="text-[11px] text-primary font-medium">
+                {activeCount} פילטרים פעילים
+              </p>
+            )}
+          </div>
         </div>
         {activeCount > 0 && (
           <button
             onClick={clearAllFilters}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors rounded-lg px-2 py-1 hover:bg-destructive/5"
           >
             <RotateCcw className="h-3 w-3" />
-            נקה הכל
+            נקה
           </button>
         )}
       </div>
 
-      <Accordion
-        type="multiple"
-        defaultValue={["make", "price", "year", "fuel", "region"]}
-        className="w-full"
-      >
-        {/* ─── Make & Model ─── */}
-        <AccordionItem value="make">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            יצרן ודגם
-          </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
-            <select
-              value={currentFilters.make}
-              onChange={(e) => {
-                updateFilter("make", e.target.value);
-                if (e.target.value !== currentFilters.make) {
-                  updateFilter("model", "");
-                }
-              }}
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-            >
-              <option value="">כל היצרנים</option>
-              {CAR_MAKES.filter((m) => m.value !== "other").map((make) => (
-                <option key={make.value} value={make.value}>
-                  {make.label}
-                </option>
-              ))}
-            </select>
+      {/* ─── Make ─── */}
+      <FilterSection icon={Sparkles} title="יצרן" defaultOpen>
+        <SearchableSelect
+          value={currentFilters.make}
+          onChange={(val) => {
+            updateFilter("make", val);
+            if (val !== currentFilters.make) updateFilter("model", "");
+          }}
+          options={makeOptions}
+          placeholder="כל היצרנים"
+          emptyText="לא נמצא יצרן"
+        />
+      </FilterSection>
 
-            {availableModels.length > 0 && (
-              <select
-                value={currentFilters.model}
-                onChange={(e) => updateFilter("model", e.target.value)}
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-              >
-                <option value="">כל הדגמים</option>
-                {availableModels.map((model) => (
-                  <option key={model} value={model}>
-                    {model}
-                  </option>
-                ))}
-              </select>
-            )}
-          </AccordionContent>
-        </AccordionItem>
+      {/* ─── Model (conditional) ─── */}
+      {availableModels.length > 0 && (
+        <FilterSection icon={Settings2} title="דגם" defaultOpen>
+          <SearchableSelect
+            value={currentFilters.model}
+            onChange={(val) => updateFilter("model", val)}
+            options={modelOptions}
+            placeholder="כל הדגמים"
+            emptyText="לא נמצא דגם"
+          />
+        </FilterSection>
+      )}
 
-        {/* ─── Price Range ─── */}
-        <AccordionItem value="price">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            טווח מחירים
-          </AccordionTrigger>
-          <AccordionContent className="space-y-4 pb-4">
-            <Slider
-              min={PRICE_MIN}
-              max={PRICE_MAX}
-              step={PRICE_STEP}
-              value={[currentFilters.minPrice, currentFilters.maxPrice]}
-              onValueCommit={(values) =>
-                updateRangeFilter("minPrice", "maxPrice", values, PRICE_MIN, PRICE_MAX)
-              }
-              className="mt-2"
-            />
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{formatPrice(currentFilters.minPrice)}</span>
-              <span>{formatPrice(currentFilters.maxPrice)}</span>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+      {/* ─── Price ─── */}
+      <FilterSection icon={Tag} title="טווח מחירים" defaultOpen>
+        <div className="space-y-3">
+          <Slider
+            min={PRICE_MIN}
+            max={PRICE_MAX}
+            step={PRICE_STEP}
+            value={[currentFilters.minPrice, currentFilters.maxPrice]}
+            onValueCommit={(values) =>
+              updateRangeFilter("minPrice", "maxPrice", values, PRICE_MIN, PRICE_MAX)
+            }
+          />
+          <div className="flex items-center justify-between">
+            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
+              {formatPrice(currentFilters.minPrice)}
+            </span>
+            <div className="h-px flex-1 mx-2 bg-border" />
+            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
+              {formatPrice(currentFilters.maxPrice)}
+            </span>
+          </div>
+        </div>
+      </FilterSection>
 
-        {/* ─── Year Range ─── */}
-        <AccordionItem value="year">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            שנת ייצור
-          </AccordionTrigger>
-          <AccordionContent className="space-y-4 pb-4">
-            <Slider
-              min={MIN_YEAR}
-              max={MAX_YEAR}
-              step={1}
-              value={[currentFilters.minYear, currentFilters.maxYear]}
-              onValueCommit={(values) =>
-                updateRangeFilter("minYear", "maxYear", values, MIN_YEAR, MAX_YEAR)
-              }
-              className="mt-2"
-            />
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{currentFilters.minYear}</span>
-              <span>{currentFilters.maxYear}</span>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+      {/* ─── Year ─── */}
+      <FilterSection icon={Calendar} title="שנת ייצור" defaultOpen>
+        <div className="space-y-3">
+          <Slider
+            min={MIN_YEAR}
+            max={MAX_YEAR}
+            step={1}
+            value={[currentFilters.minYear, currentFilters.maxYear]}
+            onValueCommit={(values) =>
+              updateRangeFilter("minYear", "maxYear", values, MIN_YEAR, MAX_YEAR)
+            }
+          />
+          <div className="flex items-center justify-between">
+            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
+              {currentFilters.minYear}
+            </span>
+            <div className="h-px flex-1 mx-2 bg-border" />
+            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
+              {currentFilters.maxYear}
+            </span>
+          </div>
+        </div>
+      </FilterSection>
 
-        {/* ─── KM Range ─── */}
-        <AccordionItem value="km">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            קילומטראז&#39;
-          </AccordionTrigger>
-          <AccordionContent className="space-y-4 pb-4">
-            <Slider
-              min={KM_MIN}
-              max={KM_MAX}
-              step={KM_STEP}
-              value={[currentFilters.minKm, currentFilters.maxKm]}
-              onValueCommit={(values) =>
-                updateRangeFilter("minKm", "maxKm", values, KM_MIN, KM_MAX)
-              }
-              className="mt-2"
-            />
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{formatKm(currentFilters.minKm)}</span>
-              <span>{formatKm(currentFilters.maxKm)}</span>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+      {/* ─── KM ─── */}
+      <FilterSection icon={Gauge} title="קילומטראז'">
+        <div className="space-y-3">
+          <Slider
+            min={KM_MIN}
+            max={KM_MAX}
+            step={KM_STEP}
+            value={[currentFilters.minKm, currentFilters.maxKm]}
+            onValueCommit={(values) =>
+              updateRangeFilter("minKm", "maxKm", values, KM_MIN, KM_MAX)
+            }
+          />
+          <div className="flex items-center justify-between">
+            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
+              {formatKm(currentFilters.minKm)}
+            </span>
+            <div className="h-px flex-1 mx-2 bg-border" />
+            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
+              {formatKm(currentFilters.maxKm)}
+            </span>
+          </div>
+        </div>
+      </FilterSection>
 
-        {/* ─── Fuel Type ─── */}
-        <AccordionItem value="fuel">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            סוג דלק
-          </AccordionTrigger>
-          <AccordionContent className="space-y-2.5 pb-4">
-            {Object.entries(FUEL_TYPES).map(([key, label]) => (
-              <div key={key} className="flex items-center gap-2.5">
-                <Checkbox
-                  id={`fuel-${key}`}
-                  checked={currentFilters.fuelType === key}
-                  onCheckedChange={(checked) =>
-                    updateFilter("fuelType", checked ? key : "")
-                  }
-                />
-                <Label
-                  htmlFor={`fuel-${key}`}
-                  className="text-sm cursor-pointer"
-                >
-                  {label}
-                </Label>
-              </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
+      {/* ─── Fuel Type ─── */}
+      <FilterSection icon={Fuel} title="סוג דלק" defaultOpen>
+        <ChipSelect
+          options={Object.entries(FUEL_TYPES).map(([key, label]) => ({
+            key,
+            label,
+          }))}
+          value={currentFilters.fuelType}
+          onChange={(val) => updateFilter("fuelType", val)}
+        />
+      </FilterSection>
 
-        {/* ─── Transmission ─── */}
-        <AccordionItem value="transmission">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            תיבת הילוכים
-          </AccordionTrigger>
-          <AccordionContent className="space-y-2.5 pb-4">
-            {Object.entries(TRANSMISSION_TYPES).map(([key, label]) => (
-              <div key={key} className="flex items-center gap-2.5">
-                <Checkbox
-                  id={`trans-${key}`}
-                  checked={currentFilters.transmission === key}
-                  onCheckedChange={(checked) =>
-                    updateFilter("transmission", checked ? key : "")
-                  }
-                />
-                <Label
-                  htmlFor={`trans-${key}`}
-                  className="text-sm cursor-pointer"
-                >
-                  {label}
-                </Label>
-              </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
+      {/* ─── Transmission ─── */}
+      <FilterSection icon={Settings2} title="תיבת הילוכים">
+        <ChipSelect
+          options={Object.entries(TRANSMISSION_TYPES).map(([key, label]) => ({
+            key,
+            label,
+          }))}
+          value={currentFilters.transmission}
+          onChange={(val) => updateFilter("transmission", val)}
+        />
+      </FilterSection>
 
-        {/* ─── Region ─── */}
-        <AccordionItem value="region">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            אזור
-          </AccordionTrigger>
-          <AccordionContent className="space-y-2.5 pb-4">
-            {Object.entries(REGIONS).map(([key, label]) => (
-              <div key={key} className="flex items-center gap-2.5">
-                <Checkbox
-                  id={`region-${key}`}
-                  checked={currentFilters.region === key}
-                  onCheckedChange={(checked) =>
-                    updateFilter("region", checked ? key : "")
-                  }
-                />
-                <Label
-                  htmlFor={`region-${key}`}
-                  className="text-sm cursor-pointer"
-                >
-                  {label}
-                </Label>
-              </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
+      {/* ─── Region ─── */}
+      <FilterSection icon={MapPin} title="אזור">
+        <ChipSelect
+          options={Object.entries(REGIONS).map(([key, label]) => ({
+            key,
+            label,
+          }))}
+          value={currentFilters.region}
+          onChange={(val) => updateFilter("region", val)}
+        />
+      </FilterSection>
 
-        {/* ─── Hand ─── */}
-        <AccordionItem value="hand">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            יד
-          </AccordionTrigger>
-          <AccordionContent className="space-y-2.5 pb-4">
-            {HAND_OPTIONS.map(({ value, label }) => (
-              <div key={value} className="flex items-center gap-2.5">
-                <Checkbox
-                  id={`hand-${value}`}
-                  checked={currentFilters.hand === String(value)}
-                  onCheckedChange={(checked) =>
-                    updateFilter("hand", checked ? String(value) : "")
-                  }
-                />
-                <Label
-                  htmlFor={`hand-${value}`}
-                  className="text-sm cursor-pointer"
-                >
-                  {label}
-                </Label>
-              </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
+      {/* ─── Hand ─── */}
+      <FilterSection icon={Hand} title="יד">
+        <ChipSelect
+          options={HAND_OPTIONS.map(({ value, label }) => ({
+            key: String(value),
+            label,
+          }))}
+          value={currentFilters.hand}
+          onChange={(val) => updateFilter("hand", val)}
+        />
+      </FilterSection>
 
-        {/* ─── Category ─── */}
-        <AccordionItem value="category">
-          <AccordionTrigger className="text-sm font-semibold py-3 hover:no-underline">
-            קטגוריה
-          </AccordionTrigger>
-          <AccordionContent className="space-y-2.5 pb-4">
-            {CATEGORY_TAGS.map(({ value, label }) => (
-              <div key={value} className="flex items-center gap-2.5">
-                <Checkbox
-                  id={`cat-${value}`}
-                  checked={currentFilters.category === value}
-                  onCheckedChange={(checked) =>
-                    updateFilter("category", checked ? value : "")
-                  }
-                />
-                <Label
-                  htmlFor={`cat-${value}`}
-                  className="text-sm cursor-pointer"
-                >
-                  {label}
-                </Label>
-              </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      {/* ─── Category ─── */}
+      <FilterSection icon={Tag} title="קטגוריה">
+        <ChipSelect
+          options={CATEGORY_TAGS.map(({ value, label }) => ({
+            key: value,
+            label,
+          }))}
+          value={currentFilters.category}
+          onChange={(val) => updateFilter("category", val)}
+        />
+      </FilterSection>
     </div>
   );
 
   return (
     <>
-      {/* ─── Mobile Toggle Button ─── */}
-      <Button
-        variant="outline"
+      {/* ─── Mobile Toggle ─── */}
+      <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden flex items-center gap-2"
+        className="lg:hidden inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium hover:border-primary/30 hover:shadow-sm transition-all"
       >
-        <SlidersHorizontal className="h-4 w-4" />
+        <SlidersHorizontal className="h-4 w-4 text-primary" />
         סינון
         {activeCount > 0 && (
-          <Badge variant="secondary" className="text-xs px-1.5 py-0">
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground px-1">
             {activeCount}
-          </Badge>
+          </span>
         )}
-      </Button>
+      </button>
 
       {/* ─── Mobile Drawer ─── */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="absolute inset-y-0 start-0 w-80 max-w-[85vw] bg-background border-e border-border shadow-2xl overflow-y-auto p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold">סינון תוצאות</h2>
+          <div className="absolute inset-y-0 start-0 w-80 max-w-[85vw] bg-background shadow-2xl shadow-black/30 overflow-hidden flex flex-col animate-fade-up">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-card/50">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <SlidersHorizontal className="h-4 w-4 text-primary" />
+                </div>
+                <h2 className="font-bold text-sm">סינון תוצאות</h2>
+              </div>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted transition-colors"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4.5 w-4.5" />
               </button>
             </div>
-            {filterContent}
-            <div className="sticky bottom-0 pt-4 pb-2 bg-background border-t border-border mt-4">
-              <Button
+
+            {/* Drawer Content */}
+            <div className="flex-1 overflow-y-auto px-5 py-3">
+              {filterContent}
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="px-5 py-4 border-t border-border bg-card/50">
+              <button
                 onClick={() => setMobileOpen(false)}
-                className="w-full"
+                className="w-full inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
               >
                 הצגת תוצאות
                 <ChevronLeft className="h-4 w-4 ms-2" />
-              </Button>
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {/* ─── Desktop Sidebar ─── */}
-      <aside className="hidden lg:block w-64 shrink-0">
-        <div className="sticky top-24 rounded-2xl border border-border bg-card p-5 max-h-[calc(100dvh-7rem)] overflow-y-auto">
+      <aside className="hidden lg:block w-[272px] shrink-0">
+        <div className="sticky top-24 rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-5 max-h-[calc(100dvh-7rem)] overflow-y-auto shadow-sm">
           {filterContent}
         </div>
       </aside>

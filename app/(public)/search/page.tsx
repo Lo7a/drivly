@@ -184,7 +184,7 @@ export default async function SearchPage({
   return (
     <div className="min-h-[80dvh] pb-16">
       {/* ─── Page Header ─── */}
-      <div className="border-b border-border bg-card/50">
+      <div className="border-b border-border bg-card/50 pt-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
