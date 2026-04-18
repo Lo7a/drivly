@@ -36,16 +36,19 @@ export function PWAInstaller() {
     const handler = (e: Event) => {
       e.preventDefault();
       setPromptEvent(e as BeforeInstallPromptEvent);
-      const dismissed = localStorage.getItem("pwa-install-dismissed");
-      if (!dismissed) setShowBanner(true);
+      const dismissedAt = localStorage.getItem("pwa-install-dismissed-at");
+      const shouldShow = !dismissedAt || Date.now() - Number(dismissedAt) > 3 * 24 * 60 * 60 * 1000;
+      if (shouldShow) setShowBanner(true);
     };
     window.addEventListener("beforeinstallprompt", handler);
 
     // iOS: show instructions after a delay (since beforeinstallprompt doesn't fire)
     if (ios && !standalone) {
-      const dismissed = localStorage.getItem("pwa-install-dismissed");
-      if (!dismissed) {
-        const timer = setTimeout(() => setShowBanner(true), 5000);
+      const dismissedAt = localStorage.getItem("pwa-install-dismissed-at");
+      // Show again after 3 days
+      const shouldShow = !dismissedAt || Date.now() - Number(dismissedAt) > 3 * 24 * 60 * 60 * 1000;
+      if (shouldShow) {
+        const timer = setTimeout(() => setShowBanner(true), 3000);
         return () => {
           clearTimeout(timer);
           window.removeEventListener("beforeinstallprompt", handler);
@@ -68,7 +71,7 @@ export function PWAInstaller() {
 
   const handleDismiss = () => {
     setShowBanner(false);
-    localStorage.setItem("pwa-install-dismissed", "true");
+    localStorage.setItem("pwa-install-dismissed-at", String(Date.now()));
   };
 
   // Already installed or no way to install — don't show
