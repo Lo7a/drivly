@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Car, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Car, Settings, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { UserMenu } from "@/components/shared/UserMenu";
 
 const NAV_ITEMS = [
   { href: "/dealer/dashboard", label: "דשבורד", icon: LayoutDashboard },
@@ -35,10 +36,7 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
             </Link>
             <span className="hidden sm:inline text-xs text-muted-foreground border border-border rounded-full px-2.5 py-1">אזור סוחרים</span>
           </div>
-          <Link href="/login" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors">
-            <LogOut className="h-3.5 w-3.5" />
-            יציאה
-          </Link>
+          <UserMenu />
         </div>
       </header>
 

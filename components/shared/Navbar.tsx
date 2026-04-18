@@ -2,7 +2,8 @@
 
 import { Logo } from "@/components/shared/Logo";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
-import { Menu, X, User } from "lucide-react";
+import { UserMenu } from "@/components/shared/UserMenu";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -36,13 +37,7 @@ export function Navbar() {
 
         <div className="hidden lg:flex items-center gap-3">
           <ThemeToggle />
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 rounded-xl bg-white/[0.06] backdrop-blur border border-white/15 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/[0.12] transition-all"
-          >
-            <User className="h-4 w-4" />
-            אזור סוחרים
-          </Link>
+          <UserMenu />
         </div>
 
         <div className="flex lg:hidden items-center gap-2">

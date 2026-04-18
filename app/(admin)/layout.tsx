@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Car, Users, FileText, Settings, LogOut, Menu, X, Shield } from "lucide-react";
+import { LayoutDashboard, Car, Users, FileText, Settings, Menu, X, Shield } from "lucide-react";
 import { useState } from "react";
+import { UserMenu } from "@/components/shared/UserMenu";
 
 const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "דשבורד", icon: LayoutDashboard },
@@ -40,10 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               אדמין
             </span>
           </div>
-          <Link href="/login" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors">
-            <LogOut className="h-3.5 w-3.5" />
-            יציאה
-          </Link>
+          <UserMenu />
         </div>
       </header>
 
