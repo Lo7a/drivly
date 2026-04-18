@@ -1,6 +1,10 @@
 import { HeroSection } from "@/components/shared/HeroSection";
 import { SearchFilters } from "@/components/shared/SearchFilters";
 import { CATEGORY_TAGS } from "@/lib/constants";
+import { prisma } from "@/lib/prisma";
+import { formatPrice, formatKm } from "@/lib/format";
+import { FUEL_TYPES, TRANSMISSION_TYPES } from "@/lib/constants";
+import Image from "next/image";
 import {
   Car,
   Calculator,
@@ -30,7 +34,25 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   offroad: <Mountain className="h-5 w-5" />,
 };
 
-export default function HomePage() {
+async function getFeaturedCars() {
+  try {
+    const cars = await prisma.car.findMany({
+      where: { status: "APPROVED" },
+      orderBy: { viewsCount: "desc" },
+      take: 4,
+      include: {
+        images: { orderBy: { order: "asc" }, take: 1 },
+      },
+    });
+    return cars;
+  } catch {
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const featuredCars = await getFeaturedCars();
+
   return (
     <>
       {/* ═══ HERO ═══ */}
@@ -251,39 +273,52 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              { make: "טויוטה", model: "קורולה", year: 2023, price: "115,000₪", km: "32,000", hand: 1, monthly: "~2,150₪" },
-              { make: "יונדאי", model: "טוסון", year: 2022, price: "145,000₪", km: "48,000", hand: 1, monthly: "~2,800₪" },
-              { make: "מאזדה", model: "CX-5", year: 2023, price: "165,000₪", km: "25,000", hand: 1, monthly: "~3,100₪" },
-              { make: "סקודה", model: "אוקטביה", year: 2024, price: "135,000₪", km: "15,000", hand: 1, monthly: "~2,500₪" },
-            ].map((car, i) => (
-              <div key={i} className="card-hover group overflow-hidden rounded-2xl border border-border bg-card">
-                <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Car className="h-16 w-16 text-muted-foreground/10 group-hover:scale-110 transition-transform duration-500" />
+            {featuredCars.map((car) => {
+              const imageUrl = car.images[0]?.url || "/hero-bg.png";
+              const monthly = Math.round(((car.price * 0.8) / 48 + 350 + 600) / 10) * 10;
+              return (
+                <Link
+                  key={car.id}
+                  href={`/car/${car.slug}`}
+                  className="card-hover group block overflow-hidden rounded-2xl border border-border bg-card"
+                >
+                  <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 overflow-hidden">
+                    {imageUrl ? (
+                      <Image
+                        src={imageUrl}
+                        alt={`${car.make} ${car.model} ${car.year}`}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Car className="h-16 w-16 text-muted-foreground/10" />
+                      </div>
+                    )}
+                    <div className="absolute bottom-3 start-3 glass rounded-lg px-3 py-1.5 shadow-lg">
+                      <span className="text-base font-bold">{formatPrice(car.price)}</span>
+                    </div>
+                    <div className="absolute top-3 start-3 rounded-md bg-foreground/80 text-background px-2.5 py-1 text-xs font-medium">
+                      יד {car.hand}
+                    </div>
+                    <div className="absolute top-3 end-3 rounded-md bg-primary/90 text-primary-foreground px-2.5 py-1 text-xs font-medium">
+                      ~{formatPrice(monthly)}/חודש
+                    </div>
                   </div>
-                  <div className="absolute bottom-3 start-3 glass rounded-lg px-3 py-1.5 shadow-lg">
-                    <span className="text-base font-bold">{car.price}</span>
+                  <div className="p-4">
+                    <h3 className="font-bold text-sm mb-2 group-hover:text-primary transition-colors">
+                      {car.make} {car.model} {car.year}
+                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {[formatKm(car.km), TRANSMISSION_TYPES[car.transmission], FUEL_TYPES[car.fuelType]].map((tag) => (
+                        <span key={tag} className="inline-flex rounded-md bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">{tag}</span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="absolute top-3 start-3 rounded-md bg-foreground/80 text-background px-2.5 py-1 text-xs font-medium">
-                    יד {car.hand}
-                  </div>
-                  <div className="absolute top-3 end-3 rounded-md bg-primary/90 text-primary-foreground px-2.5 py-1 text-xs font-medium">
-                    {car.monthly}/חודש
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-sm mb-2 group-hover:text-primary transition-colors">
-                    {car.make} {car.model} {car.year}
-                  </h3>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {[`${car.km} ק"מ`, "אוטומט", "בנזין"].map((tag) => (
-                      <span key={tag} className="inline-flex rounded-md bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -1,6 +1,65 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { MOCK_CARS } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
+
+// POST — create new car (dealer only)
+export async function POST(request: Request) {
+  try {
+    const supabase = await createClient();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+
+    if (!authUser) {
+      return NextResponse.json({ error: "לא מחובר" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { authId: authUser.id },
+      include: { dealer: true },
+    });
+
+    if (!user?.dealer) {
+      return NextResponse.json({ error: "הסוחר לא נמצא" }, { status: 403 });
+    }
+
+    if (user.dealer.status !== "APPROVED") {
+      return NextResponse.json({ error: "הסוחר עדיין לא אושר" }, { status: 403 });
+    }
+
+    const body = await request.json();
+
+    const car = await prisma.car.create({
+      data: {
+        slug: body.slug,
+        dealerId: user.dealer.id,
+        make: body.make,
+        model: body.model,
+        year: body.year,
+        price: body.price,
+        km: body.km,
+        hand: body.hand,
+        fuelType: body.fuelType,
+        transmission: body.transmission,
+        engineSize: body.engineSize,
+        color: body.color,
+        region: body.region,
+        description: body.description,
+        hasFinancing: body.hasFinancing || false,
+        hasTradeIn: body.hasTradeIn || false,
+        hasWarranty: body.hasWarranty || false,
+        status: "PENDING_APPROVAL",
+      },
+    });
+
+    return NextResponse.json({ success: true, carId: car.id }, { status: 201 });
+  } catch (e) {
+    console.error("Create car error:", e);
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "שגיאה ביצירת הרכב" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

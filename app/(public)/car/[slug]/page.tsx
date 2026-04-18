@@ -1,7 +1,36 @@
 import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import { MOCK_CARS } from "@/lib/mock-data";
 import { FUEL_TYPES, TRANSMISSION_TYPES, REGIONS, ADMIN_PHONE } from "@/lib/constants";
 import { formatPrice, formatKm, formatPhone } from "@/lib/format";
+
+async function getCar(slug: string) {
+  try {
+    const car = await prisma.car.findUnique({
+      where: { slug },
+      include: {
+        images: { orderBy: { order: "asc" } },
+        dealer: { select: { businessName: true, contactName: true, phone: true, city: true, id: true } },
+      },
+    });
+    if (car) {
+      return {
+        ...car,
+        images: car.images.length > 0 ? car.images.map((i) => i.url) : ["/hero-bg.png"],
+        dealerName: car.dealer.businessName,
+        dealerPhone: car.dealer.phone,
+        dealerCity: car.dealer.city,
+        dealerId: car.dealer.id,
+        city: car.dealer.city,
+      };
+    }
+  } catch {
+    // DB not available, fall through to mock
+  }
+
+  // Fallback to mock
+  return MOCK_CARS.find((c) => c.slug === slug);
+}
 import { LeadForm } from "@/components/shared/LeadForm";
 import { TotalMonthlyCostCard } from "@/components/calculators/TotalMonthlyCost";
 import { JsonLd } from "@/components/shared/JsonLd";
@@ -29,7 +58,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const car = MOCK_CARS.find((c) => c.slug === slug);
+  const car = await getCar(slug);
   if (!car) return { title: "רכב לא נמצא" };
 
   return {
@@ -44,8 +73,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CarDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const car = MOCK_CARS.find((c) => c.slug === slug);
+  const car = await getCar(slug);
   if (!car) notFound();
+
+  // Increment views (fire and forget)
+  try {
+    await prisma.car.update({
+      where: { slug },
+      data: { viewsCount: { increment: 1 } },
+    });
+  } catch {
+    // ignore
+  }
 
   const specs = [
     { icon: Calendar, label: "שנה", value: String(car.year) },
@@ -55,7 +94,7 @@ export default async function CarDetailPage({ params }: PageProps) {
     { icon: Settings, label: "גיר", value: TRANSMISSION_TYPES[car.transmission] },
     { icon: Palette, label: "צבע", value: car.color || "—" },
     { icon: Users, label: "מקומות", value: String(car.seats) },
-    { icon: MapPin, label: "אזור", value: car.city || REGIONS[car.region] },
+    { icon: MapPin, label: "אזור", value: car.city || (car.region ? REGIONS[car.region] : "—") },
   ];
 
   return (

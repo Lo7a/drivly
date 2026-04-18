@@ -1,37 +1,49 @@
-import { CheckCircle, XCircle, Clock, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { CAR_STATUS_LABELS } from "@/lib/constants";
 import { formatPrice, formatKm } from "@/lib/format";
-
-const MOCK_ADMIN_CARS = [
-  { id: "1", make: "טויוטה", model: "קורולה", year: 2023, price: 115000, km: 32000, dealer: "אוטו פלוס", status: "APPROVED" as const, views: 342 },
-  { id: "2", make: "יונדאי", model: "טוסון", year: 2022, price: 145000, km: 48000, dealer: "מוטורס פלוס", status: "PENDING_APPROVAL" as const, views: 0 },
-  { id: "3", make: "מאזדה", model: "CX-5", year: 2023, price: 165000, km: 25000, dealer: "צפון אוטו", status: "APPROVED" as const, views: 189 },
-  { id: "4", make: "סקודה", model: "אוקטביה", year: 2024, price: 135000, km: 15000, dealer: "אוטו פלוס", status: "PENDING_APPROVAL" as const, views: 0 },
-  { id: "5", make: "טסלה", model: "Model 3", year: 2023, price: 175000, km: 22000, dealer: "פרימיום מוטורס", status: "APPROVED" as const, views: 890 },
-  { id: "6", make: "קיה", model: "פיקנטו", year: 2023, price: 65000, km: 20000, dealer: "דיל אוטו", status: "REJECTED" as const, views: 0 },
-];
+import { prisma } from "@/lib/prisma";
+import { CarActions } from "@/components/admin/CarActions";
 
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: "bg-muted text-muted-foreground",
-  PENDING_APPROVAL: "bg-amber-500/10 text-amber-400",
-  APPROVED: "bg-emerald-500/10 text-emerald-400",
-  REJECTED: "bg-red-500/10 text-red-400",
-  SOLD: "bg-violet-500/10 text-violet-400",
+  PENDING_APPROVAL: "bg-amber-500/10 text-amber-500",
+  APPROVED: "bg-emerald-500/10 text-emerald-500",
+  REJECTED: "bg-red-500/10 text-red-500",
+  SOLD: "bg-violet-500/10 text-violet-500",
+  ARCHIVED: "bg-muted text-muted-foreground",
 };
 
-export default function AdminCarsPage() {
+async function getCars() {
+  try {
+    const cars = await prisma.car.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        dealer: { select: { businessName: true } },
+      },
+      take: 100,
+    });
+    return cars;
+  } catch {
+    return [];
+  }
+}
+
+export default async function AdminCarsPage() {
+  const cars = await getCars();
+
+  const stats = [
+    { label: "מאושרים", count: cars.filter((c) => c.status === "APPROVED").length, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-500" },
+    { label: "ממתינים", count: cars.filter((c) => c.status === "PENDING_APPROVAL").length, color: "border-amber-500/20 bg-amber-500/5 text-amber-500" },
+    { label: "נדחו", count: cars.filter((c) => c.status === "REJECTED").length, color: "border-red-500/20 bg-red-500/5 text-red-500" },
+    { label: "סה״כ", count: cars.length, color: "border-border bg-card text-foreground" },
+  ];
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-foreground mb-6">ניהול רכבים</h1>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: "מאושרים", count: MOCK_ADMIN_CARS.filter((c) => c.status === "APPROVED").length, color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-400" },
-          { label: "ממתינים", count: MOCK_ADMIN_CARS.filter((c) => c.status === "PENDING_APPROVAL").length, color: "border-amber-500/20 bg-amber-500/5 text-amber-400" },
-          { label: "נדחו", count: MOCK_ADMIN_CARS.filter((c) => c.status === "REJECTED").length, color: "border-red-500/20 bg-red-500/5 text-red-400" },
-          { label: "סה״כ", count: MOCK_ADMIN_CARS.length, color: "border-border bg-card text-white" },
-        ].map(({ label, count, color }) => (
+        {stats.map(({ label, count, color }) => (
           <div key={label} className={`rounded-xl border p-4 text-center ${color}`}>
             <p className="text-2xl font-bold">{count}</p>
             <p className="text-xs text-muted-foreground mt-1">{label}</p>
@@ -39,48 +51,40 @@ export default function AdminCarsPage() {
         ))}
       </div>
 
-      {/* Cars list */}
       <div className="space-y-3">
-        {MOCK_ADMIN_CARS.map((car) => (
-          <div
-            key={car.id}
-            className="rounded-2xl border border-border bg-card p-4 sm:p-5 hover:bg-accent transition-colors"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="font-bold text-foreground">{car.make} {car.model} {car.year}</p>
-                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${STATUS_COLORS[car.status]}`}>
-                    {CAR_STATUS_LABELS[car.status]}
-                  </span>
+        {cars.length === 0 ? (
+          <p className="text-center text-muted-foreground py-12">אין רכבים במערכת</p>
+        ) : (
+          cars.map((car) => (
+            <div
+              key={car.id}
+              className="rounded-2xl border border-border bg-card p-4 sm:p-5 hover:bg-accent transition-colors"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-bold text-foreground">{car.make} {car.model} {car.year}</p>
+                    <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${STATUS_COLORS[car.status]}`}>
+                      {CAR_STATUS_LABELS[car.status]}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {formatPrice(car.price)} · {formatKm(car.km)} · {car.dealer.businessName}
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {formatPrice(car.price)} · {formatKm(car.km)} · {car.dealer}
-                </p>
-              </div>
 
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Eye className="h-3.5 w-3.5" />
-                  {car.views}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Eye className="h-3.5 w-3.5" />
+                    {car.viewsCount}
+                  </span>
 
-                {car.status === "PENDING_APPROVAL" && (
-                  <>
-                    <button className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20 transition-colors flex items-center gap-1">
-                      <CheckCircle className="h-3.5 w-3.5" />
-                      אשר
-                    </button>
-                    <button className="rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-1">
-                      <XCircle className="h-3.5 w-3.5" />
-                      דחה
-                    </button>
-                  </>
-                )}
+                  {car.status === "PENDING_APPROVAL" && <CarActions carId={car.id} />}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

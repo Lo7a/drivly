@@ -1,24 +1,37 @@
 import Link from "next/link";
-import { Plus, Eye, MoreHorizontal } from "lucide-react";
+import { Plus, Eye, MoreHorizontal, Car } from "lucide-react";
 import { CAR_STATUS_LABELS } from "@/lib/constants";
 import { formatPrice, formatKm } from "@/lib/format";
-
-const MOCK_DEALER_CARS = [
-  { id: "1", make: "טויוטה", model: "קורולה", year: 2023, price: 115000, km: 32000, status: "APPROVED" as const, views: 342 },
-  { id: "2", make: "יונדאי", model: "טוסון", year: 2022, price: 145000, km: 48000, status: "PENDING_APPROVAL" as const, views: 0 },
-  { id: "3", make: "מאזדה", model: "CX-5", year: 2023, price: 165000, km: 25000, status: "APPROVED" as const, views: 189 },
-  { id: "4", make: "סקודה", model: "אוקטביה", year: 2024, price: 135000, km: 15000, status: "DRAFT" as const, views: 0 },
-];
+import { prisma } from "@/lib/prisma";
+import { getUser } from "@/lib/supabase/getUser";
 
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: "bg-muted text-muted-foreground",
-  PENDING_APPROVAL: "bg-amber-500/10 text-amber-400",
-  APPROVED: "bg-emerald-500/10 text-emerald-400",
-  REJECTED: "bg-red-500/10 text-red-400",
-  SOLD: "bg-violet-500/10 text-violet-400",
+  PENDING_APPROVAL: "bg-amber-500/10 text-amber-500",
+  APPROVED: "bg-emerald-500/10 text-emerald-500",
+  REJECTED: "bg-red-500/10 text-red-500",
+  SOLD: "bg-violet-500/10 text-violet-500",
+  ARCHIVED: "bg-muted text-muted-foreground",
 };
 
-export default function DealerCarsPage() {
+async function getDealerCars() {
+  try {
+    const user = await getUser();
+    if (!user?.dealer) return [];
+
+    const cars = await prisma.car.findMany({
+      where: { dealerId: user.dealer.id },
+      orderBy: { createdAt: "desc" },
+    });
+    return cars;
+  } catch {
+    return [];
+  }
+}
+
+export default async function DealerCarsPage() {
+  const cars = await getDealerCars();
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -32,49 +45,57 @@ export default function DealerCarsPage() {
         </Link>
       </div>
 
-      {/* Cars list */}
-      <div className="space-y-3">
-        {MOCK_DEALER_CARS.map((car) => (
-          <div
-            key={car.id}
-            className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 hover:bg-accent transition-colors"
+      {cars.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+          <Car className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground mb-4">אין לך עדיין רכבים במערכת</p>
+          <Link
+            href="/dealer/cars/new"
+            className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-400"
           >
-            {/* Car icon placeholder */}
-            <div className="hidden sm:flex h-16 w-24 shrink-0 items-center justify-center rounded-xl bg-card">
-              <span className="text-2xl">🚗</span>
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-foreground text-sm">
-                {car.make} {car.model} {car.year}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {formatPrice(car.price)} · {formatKm(car.km)}
-              </p>
-            </div>
-
-            {/* Status */}
-            <span className={`hidden sm:inline-flex rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLORS[car.status]}`}>
-              {CAR_STATUS_LABELS[car.status]}
-            </span>
-
-            {/* Views */}
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Eye className="h-3.5 w-3.5" />
-              {car.views}
-            </div>
-
-            {/* Actions */}
-            <Link
-              href={`/dealer/cars/${car.id}/edit`}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            <Plus className="h-4 w-4" />
+            הוסף רכב ראשון
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {cars.map((car) => (
+            <div
+              key={car.id}
+              className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 hover:bg-accent transition-colors"
             >
-              <MoreHorizontal className="h-4 w-4" />
-            </Link>
-          </div>
-        ))}
-      </div>
+              <div className="hidden sm:flex h-16 w-24 shrink-0 items-center justify-center rounded-xl bg-muted">
+                <Car className="h-6 w-6 text-muted-foreground/40" />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-foreground text-sm">
+                  {car.make} {car.model} {car.year}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {formatPrice(car.price)} · {formatKm(car.km)}
+                </p>
+              </div>
+
+              <span className={`hidden sm:inline-flex rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLORS[car.status]}`}>
+                {CAR_STATUS_LABELS[car.status]}
+              </span>
+
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Eye className="h-3.5 w-3.5" />
+                {car.viewsCount}
+              </div>
+
+              <Link
+                href={`/car/${car.slug}`}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
