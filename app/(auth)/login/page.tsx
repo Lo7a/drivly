@@ -19,7 +19,7 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/dealer/dashboard";
+  const redirectParam = searchParams.get("redirect");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,6 +49,22 @@ function LoginForm() {
       }
 
       toast.success("התחברת בהצלחה!");
+
+      // Determine redirect based on user role
+      let redirect = redirectParam;
+      if (!redirect) {
+        try {
+          const res = await fetch("/api/me");
+          const data = await res.json();
+          redirect =
+            data.user?.role === "ADMIN"
+              ? "/admin/dashboard"
+              : "/dealer/dashboard";
+        } catch {
+          redirect = "/dealer/dashboard";
+        }
+      }
+
       router.push(redirect);
       router.refresh();
     } catch {
@@ -65,7 +81,7 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${redirect}`,
+        redirectTo: `${window.location.origin}/auth/callback${redirectParam ? `?next=${redirectParam}` : ""}`,
       },
     });
     if (error) {
