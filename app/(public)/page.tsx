@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { formatPrice, formatKm } from "@/lib/format";
 import { FUEL_TYPES, TRANSMISSION_TYPES } from "@/lib/constants";
 import Image from "next/image";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import {
   Car,
   Calculator,
@@ -304,6 +305,9 @@ export default async function HomePage() {
                     </div>
                     <div className="absolute top-3 end-3 rounded-md bg-primary/90 text-primary-foreground px-2.5 py-1 text-xs font-medium">
                       ~{formatPrice(monthly)}/חודש
+                    </div>
+                    <div className="absolute bottom-3 end-3">
+                      <FavoriteButton carId={car.id} carTitle={`${car.make} ${car.model}`} />
                     </div>
                   </div>
                   <div className="p-4">

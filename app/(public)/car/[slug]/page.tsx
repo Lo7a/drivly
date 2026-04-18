@@ -51,6 +51,7 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { FavoriteButton } from "@/components/shared/FavoriteButton";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -150,6 +151,9 @@ export default async function CarDetailPage({ params }: PageProps) {
                   הנחה {Math.round((1 - car.price / car.originalPrice) * 100)}%
                 </div>
               )}
+              <div className="absolute top-4 end-4">
+                <FavoriteButton carId={car.id} carTitle={`${car.make} ${car.model}`} />
+              </div>
             </div>
 
             {/* Title + Price */}

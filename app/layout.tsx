@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Rubik } from "next/font/google";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { PWAInstaller } from "@/components/shared/PWAInstaller";
 import { Toaster } from "sonner";
 import { SITE_NAME } from "@/lib/constants";
 import "./globals.css";
@@ -60,6 +61,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-background text-foreground antialiased">
         <ThemeProvider>
           {children}
+          <PWAInstaller />
           <Toaster
             position="top-center"
             dir="rtl"

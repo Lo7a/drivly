@@ -3,20 +3,40 @@
 import { Logo } from "@/components/shared/Logo";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { UserMenu } from "@/components/shared/UserMenu";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Heart } from "lucide-react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useState } from "react";
 
 const NAV_LINKS = [
   { href: "/", label: "בית" },
   { href: "/search", label: "כל הרכבים" },
+  { href: "/favorites", label: "המועדפים שלי" },
   { href: "/login", label: "לסוחרים" },
-  { href: "#how", label: "איך זה עובד" },
-  { href: "#contact", label: "צור קשר" },
 ];
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [favCount, setFavCount] = useState(0);
+
+  useEffect(() => {
+    const update = () => {
+      try {
+        const stored = localStorage.getItem("drivly-favorites");
+        const favs = stored ? JSON.parse(stored) : [];
+        setFavCount(Array.isArray(favs) ? favs.length : 0);
+      } catch {
+        setFavCount(0);
+      }
+    };
+    update();
+    window.addEventListener("favorites-changed", update);
+    window.addEventListener("storage", update);
+    return () => {
+      window.removeEventListener("favorites-changed", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#050816]/90 backdrop-blur-xl">
@@ -36,6 +56,18 @@ export function Navbar() {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
+          <Link
+            href="/favorites"
+            className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.12] transition-colors"
+            aria-label="מועדפים"
+          >
+            <Heart className={`h-4 w-4 ${favCount > 0 ? "fill-red-500 text-red-500" : ""}`} />
+            {favCount > 0 && (
+              <span className="absolute -top-1 -end-1 inline-flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold h-4 min-w-4 px-1">
+                {favCount}
+              </span>
+            )}
+          </Link>
           <ThemeToggle />
           <UserMenu />
         </div>
