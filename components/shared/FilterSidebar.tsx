@@ -522,17 +522,17 @@ export function FilterSidebar() {
   return (
     <>
       {/* ─── Mobile: Horizontal Scrollable Filters ─── */}
-      <div className="lg:hidden">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
+      <div className="lg:hidden -mx-4 sm:-mx-6">
+        <div className="flex gap-2 overflow-x-auto scrollbar-none px-4 sm:px-6 pb-1">
           {/* "All Filters" button that opens full drawer */}
           <button
             onClick={() => setMobileOpen(true)}
-            className="shrink-0 snap-start inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 text-xs font-medium hover:border-primary/30 transition-all"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 text-xs font-medium hover:border-primary/30 transition-all"
           >
             <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
             כל הסינונים
             {activeCount > 0 && (
-              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground px-0.5">
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground px-1">
                 {activeCount}
               </span>
             )}
@@ -541,7 +541,7 @@ export function FilterSidebar() {
           {/* Make quick filter */}
           <button
             onClick={() => setMobileOpen(true)}
-            className={`shrink-0 snap-start inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
+            className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
               currentFilters.make
                 ? "border-primary/40 bg-primary/10 text-primary"
                 : "border-border bg-card text-muted-foreground hover:border-primary/30"
@@ -561,7 +561,7 @@ export function FilterSidebar() {
               onClick={() =>
                 updateFilter("fuelType", currentFilters.fuelType === key ? "" : key)
               }
-              className={`shrink-0 snap-start rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
+              className={`shrink-0 rounded-full border px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
                 currentFilters.fuelType === key
                   ? "border-primary/40 bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                   : "border-border bg-card text-muted-foreground hover:border-primary/30"
@@ -578,7 +578,7 @@ export function FilterSidebar() {
               onClick={() =>
                 updateFilter("transmission", currentFilters.transmission === key ? "" : key)
               }
-              className={`shrink-0 snap-start rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
+              className={`shrink-0 rounded-full border px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
                 currentFilters.transmission === key
                   ? "border-primary/40 bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                   : "border-border bg-card text-muted-foreground hover:border-primary/30"
@@ -595,7 +595,7 @@ export function FilterSidebar() {
               onClick={() =>
                 updateFilter("region", currentFilters.region === key ? "" : key)
               }
-              className={`shrink-0 snap-start rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
+              className={`shrink-0 rounded-full border px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
                 currentFilters.region === key
                   ? "border-primary/40 bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                   : "border-border bg-card text-muted-foreground hover:border-primary/30"
@@ -609,7 +609,7 @@ export function FilterSidebar() {
           {activeCount > 0 && (
             <button
               onClick={clearAllFilters}
-              className="shrink-0 snap-start inline-flex items-center gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition-all"
+              className="shrink-0 inline-flex items-center gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition-all whitespace-nowrap"
             >
               <RotateCcw className="h-3 w-3" />
               נקה
@@ -664,7 +664,7 @@ export function FilterSidebar() {
       )}
 
       {/* ─── Desktop Sidebar ─── */}
-      <aside className="hidden lg:block w-68 shrink-0">
+      <aside className="hidden lg:block w-64 xl:w-72 shrink-0">
         <div className="sticky top-24 rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-5 max-h-[calc(100dvh-7rem)] overflow-y-auto shadow-sm">
           {filterHeader}
           {filterSections}

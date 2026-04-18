@@ -130,6 +130,9 @@ summary,
 ::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.4); }
 
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
 /* ═══════════════════════════════════════════════════════
    Animations
    ═══════════════════════════════════════════════════════ */

@@ -370,16 +370,16 @@ function SortSelect({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm text-white/40 font-semibold shrink-0">
+    <div className="flex items-center gap-2 sm:gap-3">
+      <span className="text-xs sm:text-sm text-white/40 font-semibold shrink-0 ps-4 sm:ps-0">
         מיון:
       </span>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex gap-1.5 overflow-x-auto scrollbar-none lg:flex-wrap lg:overflow-visible pe-4 sm:pe-0">
         {SORT_OPTIONS.map((opt) => (
           <Link
             key={opt.value}
             href={buildSortUrl(opt.value)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+            className={`shrink-0 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
               currentSort === opt.value
                 ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/25"
                 : "bg-white/[0.06] text-white/50 border border-white/[0.08] hover:bg-white/[0.1] hover:text-white/70"
@@ -516,7 +516,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
 
 function FilterSidebarSkeleton() {
   return (
-    <aside className="hidden lg:block w-68 shrink-0">
+    <aside className="hidden lg:block w-64 xl:w-72 shrink-0">
       <div className="rounded-2xl border border-border bg-card/80 p-5 space-y-5">
         <div className="flex items-center gap-2.5">
           <Skeleton className="h-8 w-8 rounded-lg" />

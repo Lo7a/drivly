@@ -21,7 +21,7 @@ export default function SearchLoading() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
         <div className="flex gap-8">
           {/* Sidebar skeleton */}
-          <aside className="hidden lg:block w-68 shrink-0">
+          <aside className="hidden lg:block w-64 xl:w-72 shrink-0">
             <div className="rounded-2xl border border-border bg-card/80 p-5 space-y-5">
               <div className="flex items-center gap-2.5">
                 <Skeleton className="h-8 w-8 rounded-lg" />
