@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { UserMenu } from "@/components/shared/UserMenu";
+import { NotificationBell } from "@/components/admin/NotificationBell";
 
 const NAV_SECTIONS = [
   {
@@ -61,27 +62,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-dvh bg-background">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border h-16">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#050816]/90 backdrop-blur-xl border-b border-white/[0.06] h-16">
         <div className="flex items-center justify-between h-full px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card"
+              className="lg:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] text-white hover:bg-white/[0.12] transition-colors"
             >
               {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
             <Link href="/" className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-black text-primary-foreground text-sm">D</div>
               <span className="text-lg font-bold tracking-tight">
-                <span className="text-foreground">Driv</span><span className="text-primary">ly</span>
+                <span className="text-white">Driv</span><span className="text-primary">ly</span>
               </span>
             </Link>
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 border border-amber-500/20 bg-amber-500/5 rounded-full px-2.5 py-1">
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-amber-400 border border-amber-500/30 bg-amber-500/10 rounded-full px-2.5 py-1">
               <Shield className="h-3 w-3" />
               אדמין
             </span>
           </div>
-          <UserMenu />
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <UserMenu />
+          </div>
         </div>
       </header>
 

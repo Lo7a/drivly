@@ -19,22 +19,22 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-dvh bg-background">
       {/* Top bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border h-16">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#050816]/90 backdrop-blur-xl border-b border-white/[0.06] h-16">
         <div className="flex items-center justify-between h-full px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card"
+              className="lg:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] text-white hover:bg-white/[0.12] transition-colors"
             >
               {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
             <Link href="/" className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-black text-primary-foreground text-sm">D</div>
               <span className="text-lg font-bold tracking-tight">
-                <span className="text-foreground">Driv</span><span className="text-primary">ly</span>
+                <span className="text-white">Driv</span><span className="text-primary">ly</span>
               </span>
             </Link>
-            <span className="hidden sm:inline text-xs text-muted-foreground border border-border rounded-full px-2.5 py-1">אזור סוחרים</span>
+            <span className="hidden sm:inline text-xs text-white/60 border border-white/15 bg-white/5 rounded-full px-2.5 py-1">אזור סוחרים</span>
           </div>
           <UserMenu />
         </div>
