@@ -196,14 +196,14 @@ export default async function SearchPage({
   return (
     <div className="min-h-[80dvh]">
       {/* ═══ Dark Hero Header ═══ */}
-      <section className="relative overflow-hidden bg-[#050816] pt-24 pb-10 sm:pt-28 sm:pb-14">
+      <section className="relative overflow-hidden bg-[#050816] pt-20 pb-6 sm:pt-28 sm:pb-14">
         {/* Background effects */}
         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(ellipse_at_70%_20%,_hsl(192_80%_40%_/_0.15),_transparent_60%)]" />
         <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_20%_80%,_hsl(220_60%_50%_/_0.1),_transparent_60%)]" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-white/40 mb-6 animate-fade-in">
+          <nav className="flex items-center gap-2 text-xs text-white/40 mb-4 sm:mb-6 animate-fade-in">
             <Link
               href="/"
               className="flex items-center gap-1 hover:text-white/70 transition-colors"
@@ -215,12 +215,12 @@ export default async function SearchPage({
             <span className="text-white/70">חיפוש רכבים</span>
           </nav>
 
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-5">
             <div className="animate-fade-up">
-              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
                 חיפוש <span className="text-cyan-400">רכבים</span>
               </h1>
-              <p className="mt-2 text-sm text-white/50">
+              <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-white/50">
                 {totalCount > 0 ? (
                   <>
                     נמצאו{" "}
@@ -236,7 +236,7 @@ export default async function SearchPage({
             </div>
 
             {/* Sort Pills */}
-            <div className="animate-fade-up delay-150">
+            <div className="animate-fade-up delay-150 -mx-4 sm:mx-0">
               <SortSelect
                 currentSort={filters.sort || "newest"}
                 searchParams={flat}
@@ -246,7 +246,7 @@ export default async function SearchPage({
 
           {/* Active Filters */}
           {activeTags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 mt-5 animate-fade-up delay-200">
+            <div className="flex flex-wrap items-center gap-2 mt-4 sm:mt-5 animate-fade-up delay-200">
               <span className="text-[11px] text-white/30 font-medium">
                 פילטרים:
               </span>
@@ -275,12 +275,12 @@ export default async function SearchPage({
       </section>
 
       {/* ═══ Main Content ═══ */}
-      <section className="relative pb-16">
+      <section className="relative pb-12 sm:pb-16">
         <div className="absolute inset-0 mesh-gradient pointer-events-none" />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
-          <div className="flex gap-6 lg:gap-8">
-            {/* Sidebar */}
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4 sm:mt-8">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+            {/* Sidebar (desktop) + Horizontal chips (mobile, full width) */}
             <Suspense fallback={<FilterSidebarSkeleton />}>
               <FilterSidebar />
             </Suspense>
@@ -289,7 +289,7 @@ export default async function SearchPage({
             <div className="flex-1 min-w-0">
               {cars.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
                     {cars.map((car, i) => (
                       <div
                         key={car.slug}
@@ -301,7 +301,7 @@ export default async function SearchPage({
                     ))}
                   </div>
 
-                  <p className="text-center text-xs text-muted-foreground mt-8">
+                  <p className="text-center text-xs text-muted-foreground mt-6 sm:mt-8">
                     מציג {(page - 1) * ITEMS_PER_PAGE + 1}–
                     {Math.min(page * ITEMS_PER_PAGE, totalCount)} מתוך{" "}
                     {totalCount} רכבים

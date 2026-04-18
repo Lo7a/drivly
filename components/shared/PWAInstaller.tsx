@@ -15,11 +15,14 @@ export function PWAInstaller() {
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    // Detect iOS
-    const ios = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    // Robust iOS detection - iPhone, iPad (including iPadOS which reports as Mac)
+    const ua = window.navigator.userAgent;
+    const isIphone = /iphone|ipad|ipod/i.test(ua);
+    const isIpadOS = /macintosh/i.test(ua) && "ontouchend" in document;
+    const ios = isIphone || isIpadOS;
     setIsIOS(ios);
 
-    // Detect if already installed (standalone mode)
+    // Detect if running as installed app
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as unknown as { standalone?: boolean }).standalone === true;
@@ -32,7 +35,7 @@ export function PWAInstaller() {
         .catch((err) => console.error("SW registration failed:", err));
     }
 
-    // Android/Chrome: listen for install prompt
+    // Android Chrome: beforeinstallprompt event
     const handler = (e: Event) => {
       e.preventDefault();
       setPromptEvent(e as BeforeInstallPromptEvent);
@@ -42,17 +45,13 @@ export function PWAInstaller() {
     };
     window.addEventListener("beforeinstallprompt", handler);
 
-    // iOS: show instructions after a delay (since beforeinstallprompt doesn't fire)
+    // iOS: show manual instructions (since beforeinstallprompt doesn't fire)
     if (ios && !standalone) {
       const dismissedAt = localStorage.getItem("pwa-install-dismissed-at");
-      // Show again after 3 days
       const shouldShow = !dismissedAt || Date.now() - Number(dismissedAt) > 3 * 24 * 60 * 60 * 1000;
       if (shouldShow) {
-        const timer = setTimeout(() => setShowBanner(true), 3000);
-        return () => {
-          clearTimeout(timer);
-          window.removeEventListener("beforeinstallprompt", handler);
-        };
+        // Show immediately, no delay
+        setShowBanner(true);
       }
     }
 
@@ -74,10 +73,10 @@ export function PWAInstaller() {
     localStorage.setItem("pwa-install-dismissed-at", String(Date.now()));
   };
 
-  // Already installed or no way to install — don't show
-  if (isStandalone || !showBanner) return null;
-
-  // Only show if we have a prompt event (Android) or we're on iOS
+  // Don't show if already installed
+  if (isStandalone) return null;
+  if (!showBanner) return null;
+  // Need either a prompt event (Android) or iOS detected
   if (!promptEvent && !isIOS) return null;
 
   return (
@@ -94,15 +93,16 @@ export function PWAInstaller() {
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <Download className="h-5 w-5" />
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pe-4">
           <p className="text-sm font-bold text-foreground mb-1">התקן את Drivly</p>
 
           {isIOS ? (
             <>
               <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                לחץ על <Share className="inline h-3.5 w-3.5 text-primary mx-0.5" />
-                {" "}בתחתית המסך ובחר
-                {" "}<span className="inline-flex items-center gap-0.5 font-semibold">
+                כדי להתקין: לחץ על{" "}
+                <Share className="inline h-4 w-4 text-primary mx-0.5 align-text-bottom" />
+                {" "}בסרגל הכלים של Safari ובחר{" "}
+                <span className="inline-flex items-center gap-0.5 font-semibold text-foreground">
                   <Plus className="inline h-3 w-3" />
                   הוסף למסך הבית
                 </span>
