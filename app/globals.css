@@ -120,6 +120,12 @@ summary,
   cursor: pointer !important;
 }
 
+/* Marquee animation (V2 hero) */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 /* Accessible focus indicators — only for keyboard users */
 *:focus-visible {
   outline: 2px solid hsl(var(--primary));
