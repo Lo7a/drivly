@@ -28,11 +28,20 @@ export function PWAInstaller() {
       (window.navigator as unknown as { standalone?: boolean }).standalone === true;
     setIsStandalone(standalone);
 
-    // Register service worker
+    // Service worker: only register in production. In dev, unregister any
+    // existing SW so stale chunks don't hang around across HMR sessions.
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .catch((err) => console.error("SW registration failed:", err));
+      const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+      if (isLocalhost) {
+        navigator.serviceWorker.getRegistrations().then((regs) => {
+          regs.forEach((r) => r.unregister());
+        });
+        caches?.keys().then((keys) => keys.forEach((k) => caches.delete(k)));
+      } else {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .catch((err) => console.error("SW registration failed:", err));
+      }
     }
 
     // Android Chrome: beforeinstallprompt event
