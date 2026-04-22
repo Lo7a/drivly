@@ -21,6 +21,7 @@ import {
 } from "@/lib/constants";
 import { searchParamsSchema, type SearchParams } from "@/lib/validators";
 import type { FuelType, Region } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
 // ─── SEO ────────────────────────────────────────────────
 
@@ -36,9 +37,10 @@ export function generateMetadata({
   };
 }
 
-// ─── Mock Data (will be replaced with Prisma queries) ───
+const ITEMS_PER_PAGE = 12;
 
-const MOCK_CARS: Array<{
+// Same shape as old MOCK_CARS, built from real DB
+type CarItem = {
   slug: string;
   make: string;
   model: string;
@@ -52,22 +54,84 @@ const MOCK_CARS: Array<{
   city: string;
   imageUrl?: string | null;
   categoryTag?: string | null;
-}> = [
-  { slug: "toyota-corolla-2023-a1b2", make: "טויוטה", model: "קורולה", year: 2023, price: 115000, originalPrice: 125000, km: 32000, hand: 1, fuelType: "PETROL", region: "CENTER", city: "ראשון לציון", categoryTag: "families" },
-  { slug: "hyundai-tucson-2022-c3d4", make: "יונדאי", model: "טוסון", year: 2022, price: 145000, km: 48000, hand: 1, fuelType: "PETROL", region: "TEL_AVIV", city: "תל אביב", categoryTag: "families" },
-  { slug: "mazda-cx5-2023-e5f6", make: "מאזדה", model: "CX-5", year: 2023, price: 165000, km: 25000, hand: 1, fuelType: "PETROL", region: "HAIFA", city: "חיפה", categoryTag: "luxury" },
-  { slug: "skoda-octavia-2024-g7h8", make: "סקודה", model: "אוקטביה", year: 2024, price: 135000, km: 15000, hand: 1, fuelType: "PETROL", region: "CENTER", city: "פתח תקווה", categoryTag: "families" },
-  { slug: "kia-sportage-2023-i9j0", make: "קיה", model: "ספורטג'", year: 2023, price: 155000, km: 35000, hand: 1, fuelType: "HYBRID", region: "JERUSALEM", city: "ירושלים", categoryTag: "families" },
-  { slug: "toyota-yaris-2022-k1l2", make: "טויוטה", model: "יאריס", year: 2022, price: 75000, km: 40000, hand: 2, fuelType: "PETROL", region: "SOUTH", city: "באר שבע", categoryTag: "students" },
-  { slug: "hyundai-i20-2023-m3n4", make: "יונדאי", model: "i20", year: 2023, price: 82000, km: 28000, hand: 1, fuelType: "PETROL", region: "CENTER", city: "נתניה", categoryTag: "students" },
-  { slug: "volkswagen-golf-2023-o5p6", make: "פולקסווגן", model: "גולף", year: 2023, price: 130000, km: 22000, hand: 1, fuelType: "PETROL", region: "TEL_AVIV", city: "תל אביב", categoryTag: "luxury" },
-  { slug: "tesla-model3-2023-q7r8", make: "טסלה", model: "Model 3", year: 2023, price: 175000, km: 18000, hand: 1, fuelType: "ELECTRIC", region: "CENTER", city: "הרצליה", categoryTag: "luxury" },
-  { slug: "suzuki-swift-2022-s9t0", make: "סוזוקי", model: "סוויפט", year: 2022, price: 65000, km: 52000, hand: 2, fuelType: "PETROL", region: "NORTH", city: "טבריה", categoryTag: "economical" },
-  { slug: "bmw-x3-2022-u1v2", make: "ב.מ.וו", model: "X3", year: 2022, price: 245000, km: 38000, hand: 1, fuelType: "PETROL", region: "TEL_AVIV", city: "רמת גן", categoryTag: "luxury" },
-  { slug: "nissan-qashqai-2023-w3x4", make: "ניסאן", model: "קשקאי", year: 2023, price: 140000, km: 27000, hand: 1, fuelType: "PETROL", region: "HAIFA", city: "חיפה", categoryTag: "families" },
-];
+};
 
-const ITEMS_PER_PAGE = 12;
+async function queryCars(filters: SearchParams): Promise<CarItem[]> {
+  const where: Record<string, unknown> = { status: "APPROVED" };
+
+  if (filters.q) {
+    where.OR = [
+      { make: { contains: filters.q, mode: "insensitive" } },
+      { model: { contains: filters.q, mode: "insensitive" } },
+      { description: { contains: filters.q, mode: "insensitive" } },
+    ];
+  }
+  if (filters.make) {
+    const makeLabel = CAR_MAKES.find((m) => m.value === filters.make)?.label;
+    if (makeLabel) where.make = makeLabel;
+  }
+  if (filters.model) where.model = filters.model;
+  if (filters.minPrice || (filters.maxPrice && filters.maxPrice < 500000)) {
+    const priceFilter: Record<string, number> = {};
+    if (filters.minPrice) priceFilter.gte = filters.minPrice;
+    if (filters.maxPrice && filters.maxPrice < 500000) priceFilter.lte = filters.maxPrice;
+    where.price = priceFilter;
+  }
+  if ((filters.minYear && filters.minYear > 2005) || (filters.maxYear && filters.maxYear < new Date().getFullYear() + 1)) {
+    const yearFilter: Record<string, number> = {};
+    if (filters.minYear && filters.minYear > 2005) yearFilter.gte = filters.minYear;
+    if (filters.maxYear && filters.maxYear < new Date().getFullYear() + 1) yearFilter.lte = filters.maxYear;
+    where.year = yearFilter;
+  }
+  if (filters.minKm || (filters.maxKm && filters.maxKm < 300000)) {
+    const kmFilter: Record<string, number> = {};
+    if (filters.minKm) kmFilter.gte = filters.minKm;
+    if (filters.maxKm && filters.maxKm < 300000) kmFilter.lte = filters.maxKm;
+    where.km = kmFilter;
+  }
+  if (filters.fuelType) where.fuelType = filters.fuelType;
+  if (filters.region) where.region = filters.region;
+  if (filters.hand) where.hand = { lte: filters.hand };
+  if (filters.category) where.categoryTag = filters.category;
+
+  let orderBy: Record<string, string> = { createdAt: "desc" };
+  switch (filters.sort) {
+    case "price-asc": orderBy = { price: "asc" }; break;
+    case "price-desc": orderBy = { price: "desc" }; break;
+    case "year-desc": orderBy = { year: "desc" }; break;
+    case "km-asc": orderBy = { km: "asc" }; break;
+  }
+
+  try {
+    const cars = await prisma.car.findMany({
+      where,
+      orderBy,
+      include: {
+        images: { orderBy: { order: "asc" }, take: 1 },
+        dealer: { select: { city: true } },
+      },
+      take: 100,
+    });
+
+    return cars.map((c) => ({
+      slug: c.slug,
+      make: c.make,
+      model: c.model,
+      year: c.year,
+      price: c.price,
+      originalPrice: c.originalPrice,
+      km: c.km,
+      hand: c.hand,
+      fuelType: c.fuelType,
+      region: c.region ?? "CENTER",
+      city: c.dealer.city ?? "",
+      imageUrl: c.images[0]?.url ?? null,
+      categoryTag: c.categoryTag,
+    }));
+  } catch {
+    return [];
+  }
+}
 
 const SORT_OPTIONS = [
   { value: "newest", label: "החדשים ביותר" },
@@ -104,69 +168,6 @@ function buildActiveTagsLabel(
   return tags;
 }
 
-function filterMockCars(filters: SearchParams) {
-  let cars = [...MOCK_CARS];
-
-  if (filters.q) {
-    const q = filters.q.toLowerCase();
-    cars = cars.filter(
-      (c) =>
-        c.make.toLowerCase().includes(q) ||
-        c.model.toLowerCase().includes(q) ||
-        c.city.toLowerCase().includes(q)
-    );
-  }
-  if (filters.make) {
-    const makeLabel = CAR_MAKES.find((m) => m.value === filters.make)?.label;
-    if (makeLabel) cars = cars.filter((c) => c.make === makeLabel);
-  }
-  if (filters.model) {
-    cars = cars.filter((c) => c.model === filters.model);
-  }
-  if (filters.minPrice) {
-    cars = cars.filter((c) => c.price >= filters.minPrice!);
-  }
-  if (filters.maxPrice && filters.maxPrice < 500000) {
-    cars = cars.filter((c) => c.price <= filters.maxPrice!);
-  }
-  if (filters.minYear && filters.minYear > 2005) {
-    cars = cars.filter((c) => c.year >= filters.minYear!);
-  }
-  if (filters.maxYear && filters.maxYear < new Date().getFullYear() + 1) {
-    cars = cars.filter((c) => c.year <= filters.maxYear!);
-  }
-  if (filters.fuelType) {
-    cars = cars.filter((c) => c.fuelType === filters.fuelType);
-  }
-  if (filters.region) {
-    cars = cars.filter((c) => c.region === filters.region);
-  }
-  if (filters.hand) {
-    cars = cars.filter((c) => c.hand <= filters.hand!);
-  }
-  if (filters.category) {
-    cars = cars.filter((c) => c.categoryTag === filters.category);
-  }
-
-  switch (filters.sort) {
-    case "price-asc":
-      cars.sort((a, b) => a.price - b.price);
-      break;
-    case "price-desc":
-      cars.sort((a, b) => b.price - a.price);
-      break;
-    case "year-desc":
-      cars.sort((a, b) => b.year - a.year);
-      break;
-    case "km-asc":
-      cars.sort((a, b) => a.km - b.km);
-      break;
-    default:
-      cars.sort((a, b) => b.year - a.year || a.km - b.km);
-  }
-
-  return cars;
-}
 
 // ─── Page Component ─────────────────────────────────────
 
@@ -183,7 +184,7 @@ export default async function SearchPage({
   }
   const filters = searchParamsSchema.parse(flat);
 
-  const allCars = filterMockCars(filters);
+  const allCars = await queryCars(filters);
   const totalCount = allCars.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
   const page = Math.min(filters.page, totalPages);

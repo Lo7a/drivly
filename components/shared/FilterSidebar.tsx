@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
-import { Slider } from "@/components/ui/slider";
+import { RangeSlider } from "@/components/shared/RangeSlider";
 import {
   SlidersHorizontal,
   X,
@@ -387,74 +387,44 @@ export function FilterSidebar() {
 
       {/* ─── Price ─── */}
       <FilterSection icon={Tag} title="טווח מחירים" defaultOpen>
-        <div className="space-y-3">
-          <Slider
-            min={PRICE_MIN}
-            max={PRICE_MAX}
-            step={PRICE_STEP}
-            value={[currentFilters.minPrice, currentFilters.maxPrice]}
-            onValueCommit={(values) =>
-              updateRangeFilter("minPrice", "maxPrice", values, PRICE_MIN, PRICE_MAX)
-            }
-          />
-          <div className="flex items-center justify-between">
-            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
-              {formatPrice(currentFilters.minPrice)}
-            </span>
-            <div className="h-px flex-1 mx-2 bg-border" />
-            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
-              {formatPrice(currentFilters.maxPrice)}
-            </span>
-          </div>
-        </div>
+        <RangeSlider
+          min={PRICE_MIN}
+          max={PRICE_MAX}
+          step={PRICE_STEP}
+          value={[currentFilters.minPrice, currentFilters.maxPrice]}
+          onCommit={(values) =>
+            updateRangeFilter("minPrice", "maxPrice", values, PRICE_MIN, PRICE_MAX)
+          }
+          formatValue={formatPrice}
+        />
       </FilterSection>
 
       {/* ─── Year ─── */}
       <FilterSection icon={Calendar} title="שנת ייצור" defaultOpen>
-        <div className="space-y-3">
-          <Slider
-            min={MIN_YEAR}
-            max={MAX_YEAR}
-            step={1}
-            value={[currentFilters.minYear, currentFilters.maxYear]}
-            onValueCommit={(values) =>
-              updateRangeFilter("minYear", "maxYear", values, MIN_YEAR, MAX_YEAR)
-            }
-          />
-          <div className="flex items-center justify-between">
-            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
-              {currentFilters.minYear}
-            </span>
-            <div className="h-px flex-1 mx-2 bg-border" />
-            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
-              {currentFilters.maxYear}
-            </span>
-          </div>
-        </div>
+        <RangeSlider
+          min={MIN_YEAR}
+          max={MAX_YEAR}
+          step={1}
+          value={[currentFilters.minYear, currentFilters.maxYear]}
+          onCommit={(values) =>
+            updateRangeFilter("minYear", "maxYear", values, MIN_YEAR, MAX_YEAR)
+          }
+          formatValue={(n) => String(n)}
+        />
       </FilterSection>
 
       {/* ─── KM ─── */}
       <FilterSection icon={Gauge} title="קילומטראז'">
-        <div className="space-y-3">
-          <Slider
-            min={KM_MIN}
-            max={KM_MAX}
-            step={KM_STEP}
-            value={[currentFilters.minKm, currentFilters.maxKm]}
-            onValueCommit={(values) =>
-              updateRangeFilter("minKm", "maxKm", values, KM_MIN, KM_MAX)
-            }
-          />
-          <div className="flex items-center justify-between">
-            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
-              {formatKm(currentFilters.minKm)}
-            </span>
-            <div className="h-px flex-1 mx-2 bg-border" />
-            <span className="rounded-md bg-muted/60 px-2 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
-              {formatKm(currentFilters.maxKm)}
-            </span>
-          </div>
-        </div>
+        <RangeSlider
+          min={KM_MIN}
+          max={KM_MAX}
+          step={KM_STEP}
+          value={[currentFilters.minKm, currentFilters.maxKm]}
+          onCommit={(values) =>
+            updateRangeFilter("minKm", "maxKm", values, KM_MIN, KM_MAX)
+          }
+          formatValue={formatKm}
+        />
       </FilterSection>
 
       {/* ─── Fuel Type ─── */}

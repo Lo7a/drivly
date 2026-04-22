@@ -58,7 +58,7 @@ export default function RootLayout({
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="min-h-dvh bg-background text-foreground antialiased">
+      <body className="min-h-dvh bg-background text-foreground antialiased" suppressHydrationWarning>
         <ThemeProvider>
           {children}
           <PWAInstaller />
