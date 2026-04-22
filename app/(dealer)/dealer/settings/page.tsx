@@ -22,7 +22,7 @@ export default function DealerSettingsPage() {
     <div>
       <h1 className="text-2xl font-bold text-foreground mb-6">הגדרות</h1>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
           <h2 className="text-lg font-bold text-foreground mb-4">פרטי העסק</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

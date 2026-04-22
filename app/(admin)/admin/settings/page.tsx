@@ -43,7 +43,7 @@ export default function AdminSettingsPage() {
     <div>
       <h1 className="text-2xl font-bold text-foreground mb-6">הגדרות מערכת</h1>
 
-      <div className="max-w-3xl space-y-6">
+      <div className="space-y-6">
         {/* Contact Settings */}
         <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
           <div className="flex items-center gap-2 mb-4">

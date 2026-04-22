@@ -1,4 +1,4 @@
-const CACHE_NAME = "drivly-v1";
+const CACHE_NAME = "drivly-v2";
 const STATIC_ASSETS = ["/", "/search"];
 
 self.addEventListener("install", (event) => {
@@ -23,8 +23,16 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
 
-  // Skip API and auth routes
-  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/auth/")) return;
+  // Never cache in dev, or for Next internals, API, or auth
+  const isDev = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  if (
+    isDev ||
+    url.pathname.startsWith("/_next/") ||
+    url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/auth/")
+  ) {
+    return;
+  }
 
   // Network-first for navigation, cache-first for assets
   if (event.request.mode === "navigate") {

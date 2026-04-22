@@ -36,7 +36,7 @@ export function HeroSection() {
           alt="רכב יוקרה על במת תצוגה"
           fill
           priority
-          quality={85}
+          sizes="100vw"
           placeholder="blur"
           blurDataURL="data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAAAwAwCdASoUAAoAPzmEuVOvKKWisAgB4CcJYwC06CHDI6YAAP7l5KN8Vmo2x9zXLMVsrslN6TnCZlqdp9OIQwz77ScAAA=="
           className="object-cover object-left sm:object-center"

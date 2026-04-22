@@ -50,8 +50,8 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
+import { CarGallery } from "@/components/shared/CarGallery";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -137,21 +137,18 @@ export default async function CarDetailPage({ params }: PageProps) {
 
           {/* ── Left Column: Car Details ── */}
           <div className="space-y-6">
-            {/* Image */}
-            <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-muted">
-              <Image
-                src={car.images[0] || "/hero-bg.png"}
+            {/* Gallery */}
+            <div className="relative">
+              <CarGallery
+                images={car.images}
                 alt={`${car.make} ${car.model} ${car.year}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 60vw"
               />
               {car.originalPrice && car.originalPrice > car.price && (
-                <div className="absolute top-4 start-4 rounded-lg bg-red-500 text-white px-3 py-1.5 text-sm font-bold">
+                <div className="absolute top-4 start-4 z-20 rounded-lg bg-red-500 text-white px-3 py-1.5 text-sm font-bold shadow-lg">
                   הנחה {Math.round((1 - car.price / car.originalPrice) * 100)}%
                 </div>
               )}
-              <div className="absolute top-4 end-4">
+              <div className="absolute top-4 end-4 z-20">
                 <FavoriteButton carId={car.id} carTitle={`${car.make} ${car.model}`} />
               </div>
             </div>

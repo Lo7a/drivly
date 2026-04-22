@@ -27,6 +27,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    const images: string[] = Array.isArray(body.images) ? body.images : [];
 
     const car = await prisma.car.create({
       data: {
@@ -48,6 +49,13 @@ export async function POST(request: Request) {
         hasTradeIn: body.hasTradeIn || false,
         hasWarranty: body.hasWarranty || false,
         status: "PENDING_APPROVAL",
+        images: images.length > 0 ? {
+          create: images.map((url, idx) => ({
+            url,
+            order: idx,
+            isPrimary: idx === 0,
+          })),
+        } : undefined,
       },
     });
 

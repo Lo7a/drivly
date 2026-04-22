@@ -53,6 +53,7 @@ type CarItem = {
   region: Region;
   city: string;
   imageUrl?: string | null;
+  images?: string[];
   categoryTag?: string | null;
 };
 
@@ -107,7 +108,7 @@ async function queryCars(filters: SearchParams): Promise<CarItem[]> {
       where,
       orderBy,
       include: {
-        images: { orderBy: { order: "asc" }, take: 1 },
+        images: { orderBy: { order: "asc" } },
         dealer: { select: { city: true } },
       },
       take: 100,
@@ -126,6 +127,7 @@ async function queryCars(filters: SearchParams): Promise<CarItem[]> {
       region: c.region ?? "CENTER",
       city: c.dealer.city ?? "",
       imageUrl: c.images[0]?.url ?? null,
+      images: c.images.map((i) => i.url),
       categoryTag: c.categoryTag,
     }));
   } catch {

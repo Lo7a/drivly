@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CAR_MAKES, FUEL_TYPES, TRANSMISSION_TYPES, REGIONS, HAND_OPTIONS } from "@/lib/constants";
+import { ImageUploader } from "@/components/shared/ImageUploader";
+import { Images } from "lucide-react";
 
 export default function NewCarPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [selectedMake, setSelectedMake] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [dealerId, setDealerId] = useState<string | undefined>();
   const [form, setForm] = useState({
     model: "",
     year: "",
@@ -27,6 +31,15 @@ export default function NewCarPage() {
     hasWarranty: false,
   });
 
+  useEffect(() => {
+    fetch("/api/me")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.user?.dealerId) setDealerId(data.user.dealerId);
+      })
+      .catch(() => {});
+  }, []);
+
   const models = CAR_MAKES.find((m) => m.value === selectedMake)?.models || [];
 
   const update = (field: string, value: string | boolean) =>
@@ -36,6 +49,11 @@ export default function NewCarPage() {
     e.preventDefault();
     if (!selectedMake) {
       toast.error("בחר יצרן");
+      return;
+    }
+
+    if (images.length === 0) {
+      toast.error("הוסף לפחות תמונה אחת");
       return;
     }
 
@@ -64,6 +82,7 @@ export default function NewCarPage() {
           hasFinancing: form.hasFinancing,
           hasTradeIn: form.hasTradeIn,
           hasWarranty: form.hasWarranty,
+          images,
           status: "PENDING_APPROVAL",
         }),
       });
@@ -92,7 +111,7 @@ export default function NewCarPage() {
     <div>
       <h1 className="text-2xl font-bold text-foreground mb-6">הוספת רכב חדש</h1>
 
-      <form onSubmit={handleSubmit} className="max-w-3xl space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
           <h2 className="text-lg font-bold text-foreground mb-4">פרטי הרכב</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -177,6 +196,20 @@ export default function NewCarPage() {
               <input type="text" value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="תל אביב" className={inputClass} />
             </div>
           </div>
+        </div>
+
+        {/* Images */}
+        <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Images className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold text-foreground">תמונות הרכב</h2>
+          </div>
+          <ImageUploader
+            value={images}
+            onChange={setImages}
+            dealerId={dealerId}
+            maxImages={10}
+          />
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
