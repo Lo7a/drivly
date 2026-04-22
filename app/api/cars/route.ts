@@ -144,8 +144,8 @@ export async function GET(request: Request) {
         source: "db",
       });
     }
-  } catch (e) {
-    console.log("Prisma query failed, falling back to mock:", e);
+  } catch {
+    // DB unavailable — fall through to mock
   }
 
   // Fallback to mock data

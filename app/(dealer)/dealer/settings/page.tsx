@@ -60,7 +60,7 @@ export default function DealerSettingsPage() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-bold text-foreground transition hover:bg-cyan-400 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-cyan-400 disabled:opacity-50"
         >
           {loading ? "שומר..." : "שמור שינויים"}
           <Save className="h-4 w-4" />

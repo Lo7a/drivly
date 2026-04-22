@@ -52,10 +52,8 @@ export async function POST(request: Request) {
       }).catch(() => {}); // Ignore if car doesn't exist (mock data)
 
       return NextResponse.json({ success: true, leadId: lead.id }, { status: 201 });
-    } catch (dbError) {
-      // DB not connected or car/dealer don't exist — still accept the lead
-      console.log("DB save failed (using mock mode):", dbError);
-      console.log("Lead data:", data);
+    } catch {
+      // DB unavailable or FK missing — still accept the lead (mock mode)
       return NextResponse.json({ success: true, mock: true }, { status: 201 });
     }
   } catch {
