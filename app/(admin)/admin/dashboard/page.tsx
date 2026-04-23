@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Car, Users, FileText, TrendingUp, DollarSign, Phone } from "lucide-react";
+import { Car, Users, FileText, TrendingUp, Banknote, Phone } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { LEAD_TYPE_LABELS } from "@/lib/constants";
 
@@ -40,7 +40,7 @@ export default async function AdminDashboardPage() {
     { label: "סוחרים מאומתים", value: String(stats.dealersCount), icon: Users, color: "text-emerald-500 bg-emerald-500/10" },
     { label: "לידים בסה״כ", value: String(stats.leadsCount), icon: FileText, color: "text-amber-500 bg-amber-500/10" },
     { label: "לידים חדשים", value: String(stats.newLeads), icon: TrendingUp, color: "text-violet-500 bg-violet-500/10" },
-    { label: "לידי מימון", value: String(stats.financeLeads), icon: DollarSign, color: "text-cyan-500 bg-cyan-500/10" },
+    { label: "לידי מימון", value: String(stats.financeLeads), icon: Banknote, color: "text-cyan-500 bg-cyan-500/10" },
     { label: "לידי ביטוח", value: String(stats.insuranceLeads), icon: Phone, color: "text-rose-500 bg-rose-500/10" },
   ];
 

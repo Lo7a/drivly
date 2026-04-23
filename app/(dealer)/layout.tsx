@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Car, Settings, Menu, X } from "lucide-react";
+import { LayoutDashboard, Car, Settings, Menu, X, FileText } from "lucide-react";
 import { useState } from "react";
 import { UserMenu } from "@/components/shared/UserMenu";
 
 const NAV_ITEMS = [
   { href: "/dealer/dashboard", label: "דשבורד", icon: LayoutDashboard },
   { href: "/dealer/cars", label: "הרכבים שלי", icon: Car },
+  { href: "/dealer/leads", label: "לידים", icon: FileText },
   { href: "/dealer/settings", label: "הגדרות", icon: Settings },
 ];
 

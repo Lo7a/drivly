@@ -233,3 +233,15 @@ model LeadEvent {
   @@index([leadId, createdAt])
   @@map("lead_events")
 }
+
+// Singleton row (id=1) storing global site settings editable by admin
+model SiteSettings {
+  id         Int      @id @default(1)
+  siteName   String   @default("Drivly") @map("site_name")
+  adminPhone String   @default("050-0000000") @map("admin_phone")
+  adminEmail String?  @map("admin_email")
+  fuelPrice  Float    @default(7.5) @map("fuel_price")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
