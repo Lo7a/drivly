@@ -99,6 +99,26 @@ function SearchableSelect({
         />
       </button>
 
+      {/* Selected chip below the search — easy to remove */}
+      {value && !open && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          <span className="group inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-1 text-xs font-medium text-primary">
+            {selectedLabel}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange("");
+              }}
+              aria-label={`הסר ${selectedLabel}`}
+              className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary/20 hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </span>
+        </div>
+      )}
+
       {open && (
         <div className="mt-1.5 w-full rounded-xl border border-border bg-popover shadow-xl shadow-black/10 overflow-hidden animate-scale-in">
           <div className="p-2 border-b border-border">
