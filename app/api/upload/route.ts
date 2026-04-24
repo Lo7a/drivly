@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "הקובץ גדול מדי. מקסימום 10MB" }, { status: 400 });
     }
 
-    const supabase = await createAdminClient();
+    const supabase = createAdminClient();
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
     const safeExt = ["jpg", "jpeg", "png", "webp"].includes(ext) ? ext : "jpg";
     const fileName = `${dealerId}/${carId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
