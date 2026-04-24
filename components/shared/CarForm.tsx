@@ -119,16 +119,18 @@ export function CarForm({
         const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
         if (raw) {
           const saved = JSON.parse(raw) as Partial<CarFormData>;
-          // Only restore if there's actual content
+          // Only restore if there's actual content (images are never persisted)
           const hasContent =
             saved.makeSlug ||
             saved.model ||
             saved.price ||
             saved.km ||
-            saved.description ||
-            (saved.images && saved.images.length > 0);
+            saved.description;
           if (hasContent) {
-            setForm((prev) => ({ ...prev, ...saved }));
+            // Strip images from restored draft — always start with empty gallery
+            const { images: _images, ...rest } = saved;
+            void _images;
+            setForm((prev) => ({ ...prev, ...rest }));
             draftRestored.current = true;
             setShowDraftBanner(true);
           }
@@ -142,6 +144,8 @@ export function CarForm({
   }, []);
 
   // ─── Auto-save draft on every form change (create mode only) ───
+  // Images are NOT persisted — they'd be orphans in Storage if the draft
+  // is never submitted. User re-uploads after restoring a draft.
   useEffect(() => {
     if (mode !== "create" || !draftLoaded) return;
     try {
@@ -151,14 +155,15 @@ export function CarForm({
         !form.model &&
         !form.price &&
         !form.km &&
-        !form.description &&
-        form.images.length === 0;
+        !form.description;
       if (isEmpty) {
         localStorage.removeItem(DRAFT_STORAGE_KEY);
         localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
         return;
       }
-      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(form));
+      const { images: _images, ...toSave } = form;
+      void _images;
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(toSave));
       localStorage.setItem(DRAFT_TIMESTAMP_KEY, String(Date.now()));
     } catch {
       // localStorage quota / unavailable — ignore silently
@@ -286,8 +291,8 @@ export function CarForm({
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground">טיוטה שוחזרה</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              המשכנו מהמקום שבו הפסקת. לחיצה על &quot;שלח לאישור&quot; או
-              &quot;ביטול&quot; תנקה את הטיוטה.
+              המשכנו מהמקום שבו הפסקת. תמונות צריכות להיות מועלות מחדש.
+              לחיצה על &quot;שלח לאישור&quot; או &quot;ביטול&quot; תנקה את הטיוטה.
             </p>
           </div>
           <button
