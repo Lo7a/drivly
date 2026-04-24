@@ -277,18 +277,24 @@ export function FilterSidebar() {
     return count;
   }, [currentFilters]);
 
-  const updateFilter = useCallback(
-    (key: string, value: string) => {
+  // Atomic batch update — all changes go in a single router.push so they
+  // don't race with each other reading the same stale searchParams.
+  const updateFilters = useCallback(
+    (changes: Record<string, string>) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
+      for (const [key, value] of Object.entries(changes)) {
+        if (value) params.set(key, value);
+        else params.delete(key);
       }
       params.delete("page");
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
     },
     [router, pathname, searchParams]
+  );
+
+  const updateFilter = useCallback(
+    (key: string, value: string) => updateFilters({ [key]: value }),
+    [updateFilters]
   );
 
   const updateRangeFilter = useCallback(
@@ -363,8 +369,12 @@ export function FilterSidebar() {
         <SearchableSelect
           value={currentFilters.make}
           onChange={(val) => {
-            updateFilter("make", val);
-            if (val !== currentFilters.make) updateFilter("model", "");
+            // Atomic: change make AND clear model in one update
+            if (val !== currentFilters.make) {
+              updateFilters({ make: val, model: "" });
+            } else {
+              updateFilter("make", val);
+            }
           }}
           options={makeOptions}
           placeholder="כל היצרנים"

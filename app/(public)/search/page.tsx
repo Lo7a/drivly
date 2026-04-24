@@ -91,8 +91,12 @@ async function queryCars(filters: SearchParams): Promise<CarItem[]> {
     where.km = kmFilter;
   }
   if (filters.fuelType) where.fuelType = filters.fuelType;
+  if (filters.transmission) where.transmission = filters.transmission;
   if (filters.region) where.region = filters.region;
-  if (filters.hand) where.hand = { lte: filters.hand };
+  if (filters.hand) {
+    // "4+" means fourth-hand or more; 1/2/3 are exact
+    where.hand = filters.hand >= 4 ? { gte: 4 } : filters.hand;
+  }
   if (filters.category) where.categoryTag = filters.category;
 
   let orderBy: Record<string, string> = { createdAt: "desc" };
