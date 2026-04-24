@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Phone, Send, Calculator, Shield } from "lucide-react";
-import { ADMIN_PHONE } from "@/lib/constants";
 import { formatPhone } from "@/lib/format";
 import { PriceInput } from "@/components/shared/PriceInput";
 
@@ -13,6 +12,8 @@ interface LeadFormProps {
   dealerId: string;
   dealerPhone: string;
   carTitle: string;
+  /** Notify parent when the active tab changes (for conditional UI elsewhere). */
+  onTabChange?: (tab: LeadType) => void;
 }
 
 const TABS: { type: LeadType; label: string; icon: React.ReactNode }[] = [
@@ -21,9 +22,13 @@ const TABS: { type: LeadType; label: string; icon: React.ReactNode }[] = [
   { type: "INSURANCE", label: "בדוק ביטוח", icon: <Shield className="h-4 w-4" /> },
 ];
 
-export function LeadForm({ carId, dealerId, dealerPhone, carTitle }: LeadFormProps) {
+export function LeadForm({ carId, dealerId, dealerPhone, carTitle, onTabChange }: LeadFormProps) {
   const [activeTab, setActiveTab] = useState<LeadType>("CALL");
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    onTabChange?.(activeTab);
+  }, [activeTab, onTabChange]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     fullName: "",
