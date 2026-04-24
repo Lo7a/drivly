@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Plus, Eye, MoreHorizontal, Car } from "lucide-react";
 import { CAR_STATUS_LABELS } from "@/lib/constants";
 import { formatPrice, formatKm } from "@/lib/format";
@@ -22,6 +23,13 @@ async function getDealerCars() {
     const cars = await prisma.car.findMany({
       where: { dealerId: user.dealer.id },
       orderBy: { createdAt: "desc" },
+      include: {
+        images: {
+          where: { isPrimary: true },
+          take: 1,
+          select: { url: true },
+        },
+      },
     });
     return cars;
   } catch {
@@ -62,10 +70,22 @@ export default async function DealerCarsPage() {
           {cars.map((car) => (
             <div
               key={car.id}
-              className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 hover:bg-accent transition-colors"
+              className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-border bg-card p-3 sm:p-4 hover:bg-accent transition-colors"
             >
-              <div className="hidden sm:flex h-16 w-24 shrink-0 items-center justify-center rounded-xl bg-muted">
-                <Car className="h-6 w-6 text-muted-foreground/40" />
+              <div className="relative h-14 w-20 sm:h-16 sm:w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
+                {car.images[0]?.url ? (
+                  <Image
+                    src={car.images[0].url}
+                    alt={`${car.make} ${car.model} ${car.year}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 80px, 96px"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Car className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground/40" />
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 min-w-0">
