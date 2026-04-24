@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { Bell, FileText, UserPlus, Car, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 async function getNotifications() {
   try {
     const [newLeads, pendingDealers, pendingCars] = await Promise.all([

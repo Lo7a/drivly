@@ -3,6 +3,8 @@ import { Car, Users, FileText, TrendingUp, Banknote, Phone } from "lucide-react"
 import { prisma } from "@/lib/prisma";
 import { LEAD_TYPE_LABELS } from "@/lib/constants";
 
+export const dynamic = "force-dynamic";
+
 const TYPE_COLORS: Record<string, string> = {
   CALL: "bg-amber-500/10 text-amber-500",
   FINANCE: "bg-cyan-500/10 text-cyan-500",

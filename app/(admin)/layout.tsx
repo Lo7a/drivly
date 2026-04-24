@@ -16,6 +16,7 @@ import {
   Bell,
   UserCog,
   Eye,
+  Star,
 } from "lucide-react";
 import { useState } from "react";
 import { UserMenu } from "@/components/shared/UserMenu";
@@ -36,6 +37,7 @@ const NAV_SECTIONS = [
     items: [
       { href: "/admin/leads", label: "לידים", icon: FileText },
       { href: "/admin/cars", label: "רכבים", icon: Car },
+      { href: "/admin/featured", label: "מומלצים", icon: Star },
       { href: "/admin/dealers", label: "סוחרים", icon: Users },
       { href: "/admin/users", label: "משתמשים", icon: UserCog },
     ],

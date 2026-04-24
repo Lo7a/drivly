@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Phone, Send, Calculator, Shield } from "lucide-react";
 import { ADMIN_PHONE } from "@/lib/constants";
 import { formatPhone } from "@/lib/format";
+import { PriceInput } from "@/components/shared/PriceInput";
 
 type LeadType = "CALL" | "FINANCE" | "INSURANCE";
 
@@ -152,10 +153,9 @@ export function LeadForm({ carId, dealerId, dealerPhone, carTitle }: LeadFormPro
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
                 מקדמה
               </label>
-              <input
-                type="number"
-                value={form.downPayment}
-                onChange={(e) => setForm({ ...form, downPayment: Number(e.target.value) })}
+              <PriceInput
+                value={String(form.downPayment)}
+                onChange={(v) => setForm({ ...form, downPayment: Number(v) || 0 })}
                 className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-primary"
               />
             </div>

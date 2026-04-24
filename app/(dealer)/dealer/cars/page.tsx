@@ -6,6 +6,8 @@ import { formatPrice, formatKm } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { getUser } from "@/lib/supabase/getUser";
 
+export const dynamic = "force-dynamic";
+
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: "bg-muted text-muted-foreground",
   PENDING_APPROVAL: "bg-amber-500/10 text-amber-500",

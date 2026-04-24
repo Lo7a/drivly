@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getUser } from "@/lib/supabase/getUser";
 import { CAR_STATUS_LABELS } from "@/lib/constants";
 
+export const dynamic = "force-dynamic";
+
 async function getDealerStats() {
   try {
     const user = await getUser();

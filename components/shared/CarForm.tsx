@@ -234,7 +234,18 @@ export function CarForm({
 
       let res: Response;
       if (mode === "create") {
-        const slug = `${form.makeSlug}-${form.model.toLowerCase().replace(/\s+/g, "-")}-${form.year}-${Math.random().toString(36).substring(2, 8)}`;
+        // Build a URL-safe ASCII slug (strip Hebrew and other non-ASCII chars)
+        const modelSlug = form.model
+          .toLowerCase()
+          .replace(/[֐-׿]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+        const rand = Math.random().toString(36).substring(2, 8);
+        const slug = modelSlug
+          ? `${form.makeSlug}-${modelSlug}-${form.year}-${rand}`
+          : `${form.makeSlug}-${form.year}-${rand}`;
         res = await fetch("/api/cars", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { AnalyticsCharts } from "./AnalyticsCharts";
 import { TrendingUp, Users, Car, FileText } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 async function getAnalytics() {
   try {
     // Last 30 days leads

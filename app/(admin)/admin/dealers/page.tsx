@@ -3,6 +3,8 @@ import { DEALER_STATUS_LABELS } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { DealerActions } from "@/components/admin/DealerActions";
 
+export const dynamic = "force-dynamic";
+
 const STATUS_CONFIG: Record<string, { color: string; icon: React.ReactNode }> = {
   PENDING: { color: "bg-amber-500/10 text-amber-500", icon: <Clock className="h-3.5 w-3.5" /> },
   APPROVED: { color: "bg-emerald-500/10 text-emerald-500", icon: <CheckCircle className="h-3.5 w-3.5" /> },

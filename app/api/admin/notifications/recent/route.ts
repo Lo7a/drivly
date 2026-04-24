@@ -30,7 +30,7 @@ export type RecentNotification =
 export async function GET() {
   const LIMIT = 5;
   try {
-    const [newLeads, pendingCars, pendingDealers] = await Promise.all([
+    const [newLeads, pendingCars] = await Promise.all([
       prisma.lead.findMany({
         where: { status: "NEW" },
         orderBy: { createdAt: "desc" },
@@ -42,11 +42,6 @@ export async function GET() {
         orderBy: { createdAt: "desc" },
         take: LIMIT,
         include: { dealer: { select: { businessName: true } } },
-      }),
-      prisma.dealer.findMany({
-        where: { status: "PENDING" },
-        orderBy: { createdAt: "desc" },
-        take: LIMIT,
       }),
     ]);
 
@@ -67,22 +62,13 @@ export async function GET() {
         dealerName: c.dealer.businessName,
         createdAt: c.createdAt.toISOString(),
       })),
-      ...pendingDealers.map<RecentNotification>((d) => ({
-        kind: "dealer",
-        id: d.id,
-        businessName: d.businessName,
-        contactName: d.contactName,
-        phone: d.phone,
-        createdAt: d.createdAt.toISOString(),
-      })),
     ];
 
     items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     const total =
       (await prisma.lead.count({ where: { status: "NEW" } })) +
-      (await prisma.car.count({ where: { status: "PENDING_APPROVAL" } })) +
-      (await prisma.dealer.count({ where: { status: "PENDING" } }));
+      (await prisma.car.count({ where: { status: "PENDING_APPROVAL" } }));
 
     return NextResponse.json({ items: items.slice(0, LIMIT), total });
   } catch (e) {

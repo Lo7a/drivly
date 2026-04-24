@@ -98,7 +98,7 @@ model Dealer {
   address      String?
   logoUrl      String?      @map("logo_url")
   description  String?      @db.Text
-  status       DealerStatus @default(PENDING)
+  status       DealerStatus @default(APPROVED)
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
@@ -159,6 +159,10 @@ model Car {
   clicksCount   Int              @default(0) @map("clicks_count")
   leadsCount    Int              @default(0) @map("leads_count")
 
+  // ─── Admin-curated featured list
+  isFeatured    Boolean          @default(false) @map("is_featured")
+  featuredOrder Int?             @map("featured_order")
+
   createdAt     DateTime         @default(now()) @map("created_at")
   updatedAt     DateTime         @updatedAt @map("updated_at")
 
@@ -169,6 +173,7 @@ model Car {
   @@index([status, year, price])
   @@index([status, make, model])
   @@index([dealerId, status])
+  @@index([isFeatured, featuredOrder])
   @@map("cars")
 }
 
