@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Images } from "lucide-react";
+import { Images, Save, X } from "lucide-react";
 import { CAR_MAKES, FUEL_TYPES, TRANSMISSION_TYPES, REGIONS, HAND_OPTIONS, CAR_STATUS_LABELS } from "@/lib/constants";
 import { ImageUploader } from "@/components/shared/ImageUploader";
+import { PriceInput } from "@/components/shared/PriceInput";
+
+const DRAFT_STORAGE_KEY = "drivly:car-draft-v1";
+const DRAFT_TIMESTAMP_KEY = "drivly:car-draft-ts-v1";
+const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface CarFormData {
   makeSlug: string; // for dropdown (maps to label on submit)
@@ -82,6 +87,11 @@ export function CarForm({
   const [status, setStatus] = useState<string>(initialStatus || "PENDING_APPROVAL");
   const [dealerId, setDealerId] = useState<string | undefined>(dealerIdProp);
 
+  // Draft state (only in create mode)
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [showDraftBanner, setShowDraftBanner] = useState(false);
+  const draftRestored = useRef(false);
+
   // Only fetch /api/me if we need a dealerId (create mode, non-admin)
   useEffect(() => {
     if (dealerId || mode !== "create" || isAdmin) return;
@@ -92,6 +102,82 @@ export function CarForm({
       })
       .catch(() => {});
   }, [dealerId, mode, isAdmin]);
+
+  // ─── Load draft from localStorage on mount (create mode only) ───
+  useEffect(() => {
+    if (mode !== "create") {
+      setDraftLoaded(true);
+      return;
+    }
+    try {
+      const ts = localStorage.getItem(DRAFT_TIMESTAMP_KEY);
+      if (ts && Date.now() - Number(ts) > DRAFT_MAX_AGE_MS) {
+        // expired
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
+      } else {
+        const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+        if (raw) {
+          const saved = JSON.parse(raw) as Partial<CarFormData>;
+          // Only restore if there's actual content
+          const hasContent =
+            saved.makeSlug ||
+            saved.model ||
+            saved.price ||
+            saved.km ||
+            saved.description ||
+            (saved.images && saved.images.length > 0);
+          if (hasContent) {
+            setForm((prev) => ({ ...prev, ...saved }));
+            draftRestored.current = true;
+            setShowDraftBanner(true);
+          }
+        }
+      }
+    } catch {
+      // Ignore malformed draft
+    }
+    setDraftLoaded(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Auto-save draft on every form change (create mode only) ───
+  useEffect(() => {
+    if (mode !== "create" || !draftLoaded) return;
+    try {
+      // Skip saving an empty draft
+      const isEmpty =
+        !form.makeSlug &&
+        !form.model &&
+        !form.price &&
+        !form.km &&
+        !form.description &&
+        form.images.length === 0;
+      if (isEmpty) {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
+        return;
+      }
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(form));
+      localStorage.setItem(DRAFT_TIMESTAMP_KEY, String(Date.now()));
+    } catch {
+      // localStorage quota / unavailable — ignore silently
+    }
+  }, [form, mode, draftLoaded]);
+
+  const clearDraft = () => {
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
+    } catch {}
+  };
+
+  const discardDraft = () => {
+    clearDraft();
+    setForm({ ...EMPTY, ...initial });
+    setShowDraftBanner(false);
+    toast.success("הטיוטה נמחקה");
+  };
 
   const models = CAR_MAKES.find((m) => m.value === form.makeSlug)?.models || [];
 
@@ -163,6 +249,7 @@ export function CarForm({
       }
 
       toast.success(mode === "create" ? "הרכב נשלח לאישור!" : "השינויים נשמרו");
+      if (mode === "create") clearDraft();
       router.push(redirectTo || (isAdmin ? "/admin/cars" : "/dealer/cars"));
       router.refresh();
     } catch (err) {
@@ -183,7 +270,36 @@ export function CarForm({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-foreground mb-6">{title}</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
+        <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+        {mode === "create" && draftLoaded && !showDraftBanner && (
+          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Save className="h-3 w-3" />
+            נשמר אוטומטית כטיוטה
+          </span>
+        )}
+      </div>
+
+      {showDraftBanner && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+          <Save className="h-5 w-5 text-cyan-500 shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">טיוטה שוחזרה</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              המשכנו מהמקום שבו הפסקת. לחיצה על &quot;שלח לאישור&quot; או
+              &quot;ביטול&quot; תנקה את הטיוטה.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={discardDraft}
+            className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors shrink-0"
+          >
+            <X className="h-3 w-3" />
+            מחק טיוטה
+          </button>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
@@ -240,21 +356,19 @@ export function CarForm({
             </div>
             <div>
               <label className={labelClass}>מחיר נוכחי (₪) *</label>
-              <input
-                type="number"
+              <PriceInput
                 value={form.price}
-                onChange={(e) => update("price", e.target.value)}
-                placeholder="115000"
+                onChange={(v) => update("price", v)}
+                placeholder="115,000"
                 className={inputClass}
                 required
               />
             </div>
             <div>
               <label className={labelClass}>מחיר לפני הנחה (₪)</label>
-              <input
-                type="number"
+              <PriceInput
                 value={form.originalPrice}
-                onChange={(e) => update("originalPrice", e.target.value)}
+                onChange={(v) => update("originalPrice", v)}
                 placeholder="השאר ריק אם אין הנחה"
                 className={inputClass}
               />
@@ -266,11 +380,10 @@ export function CarForm({
             </div>
             <div>
               <label className={labelClass}>קילומטראז *</label>
-              <input
-                type="number"
+              <PriceInput
                 value={form.km}
-                onChange={(e) => update("km", e.target.value)}
-                placeholder="32000"
+                onChange={(v) => update("km", v)}
+                placeholder="32,000"
                 className={inputClass}
                 required
               />
@@ -328,11 +441,10 @@ export function CarForm({
             </div>
             <div>
               <label className={labelClass}>נפח מנוע (סמ&quot;ק)</label>
-              <input
-                type="number"
+              <PriceInput
                 value={form.engineSize}
-                onChange={(e) => update("engineSize", e.target.value)}
-                placeholder="1800"
+                onChange={(v) => update("engineSize", v)}
+                placeholder="1,800"
                 className={inputClass}
               />
             </div>
@@ -374,12 +486,9 @@ export function CarForm({
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass}>אגרה שנתית (₪)</label>
-              <input
-                type="number"
-                min="0"
-                step="10"
+              <PriceInput
                 value={form.annualFee}
-                onChange={(e) => update("annualFee", e.target.value)}
+                onChange={(v) => update("annualFee", v)}
                 placeholder="1,200"
                 className={inputClass}
               />
@@ -470,7 +579,10 @@ export function CarForm({
           </button>
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => {
+              if (mode === "create") clearDraft();
+              router.back();
+            }}
             className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-medium text-muted-foreground transition hover:bg-muted"
           >
             ביטול
