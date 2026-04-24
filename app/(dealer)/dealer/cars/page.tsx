@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Eye, MoreHorizontal, Car } from "lucide-react";
+import { Plus, Eye, Pencil, ExternalLink, Car } from "lucide-react";
 import { CAR_STATUS_LABELS } from "@/lib/constants";
 import { formatPrice, formatKm } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -106,12 +106,24 @@ export default async function DealerCarsPage() {
                 {car.viewsCount}
               </div>
 
-              <Link
-                href={`/car/${car.slug}`}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Link>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Link
+                  href={`/dealer/cars/${car.id}/edit`}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 sm:px-3 py-2 text-xs font-medium text-foreground hover:bg-accent transition-colors"
+                  aria-label="ערוך רכב"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">עריכה</span>
+                </Link>
+                <Link
+                  href={`/car/${car.slug}`}
+                  target="_blank"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  aria-label="פתח בדף הציבורי"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
           ))}
         </div>

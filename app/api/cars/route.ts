@@ -37,6 +37,7 @@ export async function POST(request: Request) {
         model: body.model,
         year: body.year,
         price: body.price,
+        originalPrice: body.originalPrice ?? null,
         km: body.km,
         hand: body.hand,
         fuelType: body.fuelType,
