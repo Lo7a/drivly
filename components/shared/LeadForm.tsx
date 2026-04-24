@@ -70,6 +70,34 @@ export function LeadForm({ carId, dealerId, dealerPhone, carTitle }: LeadFormPro
   };
 
   if (submitted) {
+    const isFinance = activeTab === "FINANCE";
+    const isInsurance = activeTab === "INSURANCE";
+    const serviceName = isFinance ? "צוות המימון" : isInsurance ? "צוות הביטוח" : "";
+
+    // For finance/insurance: admin handles, never expose dealer phone
+    if (isFinance || isInsurance) {
+      return (
+        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
+            {isFinance ? (
+              <Calculator className="h-7 w-7 text-emerald-500" />
+            ) : (
+              <Shield className="h-7 w-7 text-emerald-500" />
+            )}
+          </div>
+          <h3 className="text-xl font-bold mb-2">הפנייה נשלחה!</h3>
+          <p className="text-sm text-muted-foreground mb-2">
+            {serviceName} שלנו יחזור אליך בהקדם עם הצעה מותאמת אישית.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            אין צורך ליצור קשר עם הסוחר — אנחנו כאן בשבילך בכל הנוגע ל
+            {isFinance ? "מימון" : "ביטוח"}.
+          </p>
+        </div>
+      );
+    }
+
+    // CALL tab → direct connection with the dealer
     return (
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
@@ -86,11 +114,6 @@ export function LeadForm({ carId, dealerId, dealerPhone, carTitle }: LeadFormPro
           <Phone className="h-5 w-5" />
           {formatPhone(dealerPhone)}
         </a>
-        {activeTab !== "CALL" && (
-          <p className="mt-4 text-xs text-muted-foreground">
-            לייעוץ מימון וביטוח: {formatPhone(ADMIN_PHONE)}
-          </p>
-        )}
       </div>
     );
   }

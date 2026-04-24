@@ -26,6 +26,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   students: <GraduationCap className="h-5 w-5" />,
   families: <Users className="h-5 w-5" />,
@@ -37,18 +39,23 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 
 async function getFeaturedCars() {
   try {
-    const cars = await prisma.car.findMany({
-      where: { status: "APPROVED" },
-      orderBy: { viewsCount: "desc" },
-      take: 4,
+    return await prisma.car.findMany({
+      where: { isFeatured: true, status: "APPROVED" },
+      orderBy: [{ featuredOrder: "asc" }, { updatedAt: "desc" }],
       include: {
         images: { orderBy: { order: "asc" }, take: 1 },
       },
     });
-    return cars;
   } catch {
     return [];
   }
+}
+
+function featuredGridClass(count: number): string {
+  if (count <= 1) return "grid-cols-1";
+  if (count === 2) return "grid-cols-1 md:grid-cols-2";
+  if (count === 3) return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+  return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
 }
 
 export default async function HomePage() {
@@ -260,6 +267,7 @@ export default async function HomePage() {
       </section>
 
       {/* ═══ FEATURED CARS ═══ */}
+      {featuredCars.length > 0 && (
       <section className="py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-10">
@@ -273,10 +281,14 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className={`grid gap-5 ${featuredGridClass(featuredCars.length)}`}>
             {featuredCars.map((car) => {
               const imageUrl = car.images[0]?.url || "/hero-bg.png";
               const monthly = Math.round(((car.price * 0.8) / 48 + 350 + 600) / 10) * 10;
+              const hasDiscount = car.originalPrice && car.originalPrice > car.price;
+              const discountPct = hasDiscount
+                ? Math.round((1 - car.price / (car.originalPrice as number)) * 100)
+                : 0;
               return (
                 <Link
                   key={car.id}
@@ -298,14 +310,25 @@ export default async function HomePage() {
                       </div>
                     )}
                     <div className="absolute bottom-3 start-3 glass rounded-lg px-3 py-1.5 shadow-lg">
-                      <span className="text-base font-bold">{formatPrice(car.price)}</span>
+                      <span className="text-base font-bold text-primary">{formatPrice(car.price)}</span>
+                      {hasDiscount && (
+                        <span className="ms-2 text-[11px] text-muted-foreground line-through">
+                          {formatPrice(car.originalPrice as number)}
+                        </span>
+                      )}
                     </div>
                     <div className="absolute top-3 start-3 rounded-md bg-foreground/80 text-background px-2.5 py-1 text-xs font-medium">
                       יד {car.hand}
                     </div>
-                    <div className="absolute top-3 end-3 rounded-md bg-primary/90 text-primary-foreground px-2.5 py-1 text-xs font-medium">
-                      ~{formatPrice(monthly)}/חודש
-                    </div>
+                    {hasDiscount ? (
+                      <div className="absolute top-3 end-3 rounded-md bg-red-500 text-white px-2.5 py-1 text-xs font-bold shadow-md">
+                        הנחה {discountPct}%
+                      </div>
+                    ) : (
+                      <div className="absolute top-3 end-3 rounded-md bg-primary/90 text-primary-foreground px-2.5 py-1 text-xs font-medium">
+                        ~{formatPrice(monthly)}/חודש
+                      </div>
+                    )}
                     <div className="absolute bottom-3 end-3">
                       <FavoriteButton carId={car.id} carTitle={`${car.make} ${car.model}`} />
                     </div>
@@ -326,6 +349,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ═══ DEALER CTA ═══ */}
       <section className="relative py-20 sm:py-28 overflow-hidden">

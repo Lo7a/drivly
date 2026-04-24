@@ -47,6 +47,9 @@ export function CarCard({
   const [isHovering, setIsHovering] = useState(false);
 
   const hasDiscount = originalPrice && originalPrice > price;
+  const discountPct = hasDiscount
+    ? Math.round((1 - price / (originalPrice as number)) * 100)
+    : 0;
   const hasMultiple = pics.length > 1;
 
   const handleMouseEnter = () => {
@@ -156,12 +159,19 @@ export function CarCard({
           יד {hand}
         </Badge>
 
-        {/* Image count badge */}
-        {hasMultiple && (
-          <span className="absolute top-3 end-3 z-10 rounded-full bg-black/60 backdrop-blur text-white text-[10px] font-medium px-2 py-0.5">
-            {pics.length} תמונות
-          </span>
-        )}
+        {/* Top-end badges (stack: discount + image count) */}
+        <div className="absolute top-3 end-3 z-10 flex flex-col items-end gap-1.5">
+          {hasDiscount && (
+            <span className="rounded-md bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 shadow-md">
+              הנחה {discountPct}%
+            </span>
+          )}
+          {hasMultiple && (
+            <span className="rounded-full bg-black/60 backdrop-blur text-white text-[10px] font-medium px-2 py-0.5">
+              {pics.length} תמונות
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Details */}

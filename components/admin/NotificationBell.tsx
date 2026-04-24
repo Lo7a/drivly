@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Bell, FileText, Car, UserPlus, Check } from "lucide-react";
+import { Bell, FileText, Car, UserPlus, Check, CheckCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import type { RecentNotification } from "@/app/api/admin/notifications/recent/route";
@@ -18,6 +18,31 @@ const LEAD_TYPE_LABEL: Record<string, string> = {
   FINANCE: "מימון",
   INSURANCE: "ביטוח",
 };
+
+const SEEN_KEY = "drivly:admin-seen-notifs-v1";
+
+function loadSeen(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem(SEEN_KEY);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSeen(set: Set<string>) {
+  try {
+    localStorage.setItem(SEEN_KEY, JSON.stringify(Array.from(set)));
+  } catch {
+    // storage unavailable — ignore
+  }
+}
+
+function notifKey(n: RecentNotification): string {
+  return `${n.kind}:${n.id}`;
+}
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -52,8 +77,13 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [total, setTotal] = useState(0);
   const [items, setItems] = useState<RecentNotification[]>([]);
+  const [seen, setSeen] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSeen(loadSeen());
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -130,6 +160,36 @@ export function NotificationBell() {
     }
   };
 
+  const markSeen = (keys: string[]) => {
+    setSeen((prev) => {
+      const next = new Set(prev);
+      let changed = false;
+      for (const k of keys) {
+        if (!next.has(k)) {
+          next.add(k);
+          changed = true;
+        }
+      }
+      if (changed) saveSeen(next);
+      return next;
+    });
+  };
+
+  const handleItemClick = (n: RecentNotification) => {
+    markSeen([notifKey(n)]);
+    setOpen(false);
+  };
+
+  const markAllSeen = () => {
+    markSeen(items.map(notifKey));
+    toast.success("כל ההתראות סומנו כנקראו");
+  };
+
+  // Visible count = server total - seen items that are still in the recent list
+  const visibleSeenCount = items.filter((n) => seen.has(notifKey(n))).length;
+  const displayTotal = Math.max(0, total - visibleSeenCount);
+  const hasUnseen = items.some((n) => !seen.has(notifKey(n)));
+
   return (
     <div ref={containerRef} className="relative">
       <button
@@ -139,9 +199,9 @@ export function NotificationBell() {
         className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
       >
         <Bell className="h-4 w-4" />
-        {total > 0 && (
+        {displayTotal > 0 && (
           <span className="absolute -top-1 -end-1 inline-flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold h-4 min-w-4 px-1">
-            {total > 9 ? "9+" : total}
+            {displayTotal > 9 ? "9+" : displayTotal}
           </span>
         )}
       </button>
@@ -156,15 +216,26 @@ export function NotificationBell() {
             <div className="flex items-center gap-2">
               <Bell className="h-4 w-4 text-primary" />
               <span className="text-sm font-bold text-foreground">התראות</span>
-              {total > 0 && (
+              {displayTotal > 0 && (
                 <span className="rounded-full bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5">
-                  {total}
+                  {displayTotal}
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-muted-foreground">
-              {items.length > 0 ? "5 אחרונות" : ""}
-            </span>
+            {hasUnseen ? (
+              <button
+                type="button"
+                onClick={markAllSeen}
+                className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline cursor-pointer"
+              >
+                <CheckCheck className="h-3 w-3" />
+                סמן הכל כנקרא
+              </button>
+            ) : (
+              <span className="text-[10px] text-muted-foreground">
+                {items.length > 0 ? "5 אחרונות" : ""}
+              </span>
+            )}
           </div>
 
           <div className="max-h-96 overflow-y-auto">
@@ -185,18 +256,26 @@ export function NotificationBell() {
                 {items.map((n) => {
                   const meta = TYPE_META[n.kind];
                   const Icon = meta.icon;
+                  const isSeen = seen.has(notifKey(n));
                   return (
                     <Link
                       key={`${n.kind}-${n.id}`}
                       href={notificationHref(n)}
-                      onClick={() => setOpen(false)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-accent transition-colors"
+                      onClick={() => handleItemClick(n)}
+                      className={`flex items-start gap-3 px-4 py-3 transition-colors ${
+                        isSeen
+                          ? "opacity-60 hover:opacity-100 hover:bg-accent"
+                          : "bg-primary/[0.03] hover:bg-primary/[0.07]"
+                      }`}
                     >
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${meta.bg}`}>
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${meta.bg} relative`}>
                         <Icon className="h-4 w-4" />
+                        {!isSeen && (
+                          <span className="absolute -top-0.5 -end-0.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-card" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">
+                        <p className={`text-sm truncate ${isSeen ? "font-medium text-muted-foreground" : "font-semibold text-foreground"}`}>
                           {notificationTitle(n)}
                         </p>
                         <p className="text-xs text-muted-foreground truncate mt-0.5">
