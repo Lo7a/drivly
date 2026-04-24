@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calculator, Shield, Fuel, TrendingDown } from "lucide-react";
+import { Calculator, Shield, Fuel, FileText } from "lucide-react";
 import { calculateFinance, estimateInsurance, estimateFuelCost, calculateTotalMonthlyCost } from "@/lib/calculators";
 import { formatPrice } from "@/lib/format";
 
@@ -10,9 +10,10 @@ interface TotalMonthlyCostProps {
   carYear: number;
   fuelConsumption: number; // km per liter
   fuelType: string;
+  annualFee?: number | null;
 }
 
-export function TotalMonthlyCostCard({ carPrice, carYear, fuelConsumption, fuelType }: TotalMonthlyCostProps) {
+export function TotalMonthlyCostCard({ carPrice, carYear, fuelConsumption, fuelType, annualFee }: TotalMonthlyCostProps) {
   const [downPayment, setDownPayment] = useState(Math.round(carPrice * 0.2));
   const [months, setMonths] = useState(48);
   const [driverAge, setDriverAge] = useState(30);
@@ -35,7 +36,9 @@ export function TotalMonthlyCostCard({ carPrice, carYear, fuelConsumption, fuelT
     fuelConsumptionKmPerLiter: fuelConsumption || 14,
   });
 
-  const total = calculateTotalMonthlyCost(finance, insurance, fuel);
+  const baseTotal = calculateTotalMonthlyCost(finance, insurance, fuel);
+  const feeMonthly = annualFee ? Math.round(annualFee / 12) : 0;
+  const total = { ...baseTotal, total: baseTotal.total + feeMonthly };
 
   const isElectric = fuelType === "ELECTRIC";
 
@@ -148,13 +151,39 @@ export function TotalMonthlyCostCard({ carPrice, carYear, fuelConsumption, fuelT
             </div>
           </div>
         )}
+
+        {feeMonthly > 0 && (
+          <div>
+            <div className="flex items-center justify-between text-sm mb-1.5">
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <FileText className="h-3.5 w-3.5 text-violet-500" />
+                אגרה שנתית
+              </span>
+              <span className="font-semibold">
+                {formatPrice(feeMonthly)}
+                <span className="text-[10px] text-muted-foreground ms-1">/חודש</span>
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full bg-violet-500 transition-all duration-300"
+                style={{ width: `${Math.min(100, (feeMonthly / total.total) * 100)}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1 text-end">
+              סה״כ {formatPrice(annualFee || 0)} לשנה
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Total */}
       <div className="rounded-xl bg-primary/5 border border-primary/10 p-4 flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground">סה&quot;כ עלות חודשית</p>
-          <p className="text-xs text-muted-foreground mt-0.5">כולל מימון + ביטוח{!isElectric ? " + דלק" : ""}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            כולל מימון + ביטוח{!isElectric ? " + דלק" : ""}{feeMonthly > 0 ? " + אגרה" : ""}
+          </p>
         </div>
         <p className="text-3xl font-bold text-primary">{formatPrice(total.total)}</p>
       </div>

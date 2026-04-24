@@ -240,6 +240,7 @@ export default async function CarDetailPage({ params }: PageProps) {
               carYear={car.year}
               fuelConsumption={car.fuelConsumption || 14}
               fuelType={car.fuelType}
+              annualFee={"annualFee" in car ? car.annualFee : null}
             />
           </div>
 

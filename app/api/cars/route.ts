@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         engineSize: body.engineSize,
         color: body.color,
         region: body.region,
+        annualFee: body.annualFee ?? null,
         description: body.description,
         hasFinancing: body.hasFinancing || false,
         hasTradeIn: body.hasTradeIn || false,

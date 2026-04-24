@@ -25,6 +25,7 @@ export default function NewCarPage() {
     color: "",
     region: "",
     city: "",
+    annualFee: "",
     description: "",
     hasFinancing: false,
     hasTradeIn: false,
@@ -78,6 +79,7 @@ export default function NewCarPage() {
           engineSize: form.engineSize ? Number(form.engineSize) : null,
           color: form.color || null,
           region: form.region || null,
+          annualFee: form.annualFee ? Number(form.annualFee) : null,
           description: form.description || null,
           hasFinancing: form.hasFinancing,
           hasTradeIn: form.hasTradeIn,
@@ -194,6 +196,21 @@ export default function NewCarPage() {
             <div>
               <label className={labelClass}>עיר</label>
               <input type="text" value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="תל אביב" className={inputClass} />
+            </div>
+            <div className="sm:col-span-2">
+              <label className={labelClass}>אגרה שנתית (₪)</label>
+              <input
+                type="number"
+                min="0"
+                step="10"
+                value={form.annualFee}
+                onChange={(e) => update("annualFee", e.target.value)}
+                placeholder="1,200"
+                className={inputClass}
+              />
+              <p className="text-[11px] text-muted-foreground mt-1">
+                אגרת רישוי שנתית שתוצג ללקוח במחשבון העלות החודשית
+              </p>
             </div>
           </div>
         </div>

@@ -142,6 +142,7 @@ model Car {
   // ─── Calculated / Cached
   fuelConsumption Float?         @map("fuel_consumption")
   reliability     Int?
+  annualFee       Int?           @map("annual_fee")
 
   // ─── SEO + Discovery
   slug          String           @unique
