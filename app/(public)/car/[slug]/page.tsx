@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { MOCK_CARS } from "@/lib/mock-data";
-import { FUEL_TYPES, TRANSMISSION_TYPES, REGIONS, ADMIN_PHONE } from "@/lib/constants";
+import { FUEL_TYPES, TRANSMISSION_TYPES, REGIONS } from "@/lib/constants";
 import { formatPrice, formatKm, formatPhone } from "@/lib/format";
 
 async function getCar(slug: string) {
@@ -221,16 +221,30 @@ export default async function CarDetailPage({ params }: PageProps) {
 
             {/* Dealer Info */}
             <div className="rounded-2xl border border-border bg-card p-5">
-              <h2 className="text-lg font-bold mb-3">פרטי הסוחר</h2>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold">{car.dealerName}</p>
-                  <p className="text-sm text-muted-foreground">{car.dealerCity}</p>
-                </div>
+              <div className="flex items-start justify-between mb-3">
+                <h2 className="text-lg font-bold">פרטי הסוחר</h2>
                 <div className="text-xs text-muted-foreground flex items-center gap-1.5">
                   <Shield className="h-4 w-4 text-emerald-500" />
                   סוחר מאומת
                 </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <p className="font-semibold">{car.dealerName}</p>
+                  {car.dealerCity && (
+                    <p className="text-sm text-muted-foreground">{car.dealerCity}</p>
+                  )}
+                </div>
+                {car.dealerPhone && (
+                  <a
+                    href={`tel:${car.dealerPhone}`}
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                    dir="ltr"
+                  >
+                    <Phone className="h-4 w-4" />
+                    {formatPhone(car.dealerPhone)}
+                  </a>
+                )}
               </div>
             </div>
 
@@ -253,17 +267,22 @@ export default async function CarDetailPage({ params }: PageProps) {
               carTitle={`${car.make} ${car.model} ${car.year}`}
             />
 
-            {/* Quick call */}
-            <div className="rounded-2xl border border-border bg-card p-5 text-center">
-              <p className="text-sm text-muted-foreground mb-3">רוצה לדבר עכשיו?</p>
-              <a
-                href={`tel:${ADMIN_PHONE}`}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-emerald-400 w-full justify-center"
-              >
-                <Phone className="h-4 w-4" />
-                {formatPhone(ADMIN_PHONE)}
-              </a>
-            </div>
+            {/* Quick call — dealer's phone */}
+            {car.dealerPhone && (
+              <div className="rounded-2xl border border-border bg-card p-5 text-center">
+                <p className="text-sm text-muted-foreground mb-1">רוצה לדבר עכשיו?</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  התקשר ישירות ל{car.dealerName}
+                </p>
+                <a
+                  href={`tel:${car.dealerPhone}`}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-emerald-400 w-full justify-center"
+                >
+                  <Phone className="h-4 w-4" />
+                  {formatPhone(car.dealerPhone)}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>
